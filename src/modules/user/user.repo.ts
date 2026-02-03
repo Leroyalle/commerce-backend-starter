@@ -8,6 +8,7 @@ export interface IUserRepository {
   findById(id: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   create(user: Omit<User, 'id'>): Promise<User>;
+  update(user: Partial<Omit<User, 'id'>>): Promise<User>;
 }
 
 export class UserRepo implements IUserRepository {
@@ -21,5 +22,9 @@ export class UserRepo implements IUserRepository {
 
   public async create(user: Omit<User, 'id'>): Promise<User> {
     return (await db.insert(userSchema).values(user).returning())[0];
+  }
+
+  public async update(user: Partial<Omit<User, 'id'>>): Promise<User> {
+    return (await db.update(userSchema).set(user).returning())[0];
   }
 }

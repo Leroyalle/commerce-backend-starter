@@ -12,4 +12,8 @@ export class UserCommands {
   public async create(user: Omit<User, 'id'>) {
     return await this.deps.userRepo.create(user);
   }
+
+  public update(user: Partial<Omit<User, 'id'>>) {
+    return this.deps.userRepo.update(user);
+  }
 }
