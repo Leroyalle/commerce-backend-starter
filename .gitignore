@@ -1,4 +1,5 @@
 # deps
 node_modules/
 drizzle/
-.env*
+**/.env
+**/.env.*
