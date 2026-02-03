@@ -10,7 +10,7 @@ export const userSchema = pgTable('users', {
   email: text().notNull().unique(),
   password: text().notNull(),
   phone: integer().notNull(),
-  role: roleEnum(),
+  role: roleEnum().notNull(),
 });
 
 export type User = InferSelectModel<typeof userSchema>;
