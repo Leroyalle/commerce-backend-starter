@@ -1,11 +1,10 @@
-import { CreateModuleResult } from '@/shared/types/create-module.result.type';
-
 import { UserCommands } from './user.commands';
 import { UserQueries } from './user.queries';
 import { UserRepo } from './user.repo';
 import { createUserRouter } from './user.router';
 
-export function createUserModule(): CreateModuleResult {
+// CreateModuleResult<UserCommands>;
+export function createUserModule() {
   const userRepo = new UserRepo();
   const commands = new UserCommands({
     userRepo,
@@ -14,5 +13,5 @@ export function createUserModule(): CreateModuleResult {
 
   const router = createUserRouter(commands, queries);
 
-  return { commands, router };
+  return { commands, router, queries };
 }

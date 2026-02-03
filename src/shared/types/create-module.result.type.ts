@@ -1,7 +1,6 @@
-import { Env, Hono, Schema } from 'hono';
-import { BlankEnv, BlankSchema } from 'hono/types';
+import { Hono } from 'hono';
 
-export interface CreateModuleResult {
-  commands: unknown;
-  router: Hono<BlankEnv, BlankSchema, '/'>;
+export interface CreateModuleResult<C = unknown> {
+  commands: C;
+  router: Hono;
 }
