@@ -70,7 +70,7 @@ export class AuthCommands {
     return { status: 'success', accessToken: accessToken.token };
   }
 
-  public verifyToken(token: string, type: 'access' | 'refresh') {
+  public verifyToken<T extends 'access' | 'refresh'>(token: string, type: T) {
     return this.deps.tokenCommands.verify(token, type);
   }
 

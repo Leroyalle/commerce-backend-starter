@@ -1,6 +1,11 @@
 import { jwtVerify, SignJWT } from 'jose';
 
 import { RoleEnum } from '@/shared/db/schema/user.schema';
+import {
+  AccessPayload,
+  AuthTokensPayload,
+  RefreshPayload,
+} from '@/shared/types/token-payload.type';
 
 import { JwtConfig } from './jwt.config';
 
@@ -8,20 +13,6 @@ const timeMap = {
   access: '2h',
   refresh: '30d',
 } as const;
-
-type AccessPayload = {
-  type: 'access';
-  sub: string;
-  role: RoleEnum;
-};
-
-type RefreshPayload = {
-  type: 'refresh';
-  sub: string;
-  jwi: string;
-};
-
-type Payload = AccessPayload | RefreshPayload;
 
 type SignReturnValue<T extends keyof typeof timeMap> = {
   token: string;
@@ -49,7 +40,7 @@ export class TokenService {
     data: { id: string; role: RoleEnum },
     type: keyof typeof timeMap,
   ): Promise<SignReturnValue<'access'> | SignReturnValue<'refresh'>> {
-    const payload: Payload =
+    const payload: AuthTokensPayload =
       type === 'access'
         ? { type, sub: data.id, role: data.role }
         : { type, sub: data.id, jwi: crypto.randomUUID() };
@@ -76,10 +67,14 @@ export class TokenService {
     };
   }
 
-  public async verify(token: string, type: 'refresh' | 'access') {
-    return await jwtVerify(token, this.jwtConfig[type], {
-      issuer: 'auth-service',
-      audience: 'myapp',
-    });
+  public async verify<T extends keyof typeof timeMap>(token: string, type: T) {
+    return await jwtVerify<T extends 'access' ? AccessPayload : RefreshPayload>(
+      token,
+      this.jwtConfig[type],
+      {
+        issuer: 'auth-service',
+        audience: 'myapp',
+      },
+    );
   }
 }

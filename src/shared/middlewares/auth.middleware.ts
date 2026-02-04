@@ -1,11 +1,20 @@
-import { Context } from 'hono';
+import { MiddlewareHandler } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { JWTPayload, JWTVerifyResult } from 'jose';
+import { JWTHeaderParameters, JWTPayload } from 'jose';
+
+import { AuthVars } from '../types/auth-variables.type';
+import { AccessPayload, RefreshPayload } from '../types/token-payload.type';
 
 export function authMiddleware(
-  verifyToken: (token: string, type: 'access') => Promise<JWTVerifyResult<JWTPayload>>,
-) {
-  return async (c: Context, next: Function): Promise<Response | void> => {
+  verifyToken: <T extends 'access' | 'refresh'>(
+    token: string,
+    type: T,
+  ) => Promise<{
+    payload: JWTPayload & (T extends 'access' ? AccessPayload : RefreshPayload);
+    protectedHeader: JWTHeaderParameters;
+  }>,
+): MiddlewareHandler<{ Variables: AuthVars }> {
+  return async (c, next): Promise<Response | void> => {
     const accessToken = getCookie(c, 'accessToken');
 
     if (!accessToken) {
@@ -17,6 +26,9 @@ export function authMiddleware(
     if (!payload.payload.sub) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
+
+    c.set('userId', payload.payload.sub);
+    c.set('role', payload.payload.role);
 
     await next();
   };

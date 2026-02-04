@@ -15,7 +15,7 @@ export class TokenCommands {
     return await this.deps.tokenRepo.create(token);
   }
 
-  public async verify(token: string, type: 'access' | 'refresh') {
+  public async verify<T extends 'access' | 'refresh'>(token: string, type: T) {
     return await this.deps.tokenService.verify(token, type);
   }
 }
