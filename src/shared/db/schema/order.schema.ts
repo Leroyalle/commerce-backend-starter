@@ -21,7 +21,7 @@ export const orderSchema = pgTable('orders', {
 
   phone: integer().notNull(),
   totalAmount: integer().notNull(),
-  items: jsonbConfig().$type<CartItem>().notNull(),
+  items: jsonbConfig().$type<CartItem[]>().notNull(),
 
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),

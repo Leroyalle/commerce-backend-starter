@@ -7,7 +7,7 @@ interface Deps {
 export class CartQueries {
   constructor(private readonly deps: Deps) {}
 
-  public findById(id: string) {
-    return this.deps.cartRepo.findById(id);
+  public findByUserId(userId: string) {
+    return this.deps.cartRepo.findByUserId(userId);
   }
 }

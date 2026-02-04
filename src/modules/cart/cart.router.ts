@@ -2,11 +2,11 @@ import { Hono, MiddlewareHandler } from 'hono';
 
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
-import { CardCommands } from './cart.commands';
+import { CartCommands } from './cart.commands';
 import { CartQueries } from './cart.queries';
 
 interface Deps {
-  commands: CardCommands;
+  commands: CartCommands;
   queries: CartQueries;
   accessAuthMiddleware: MiddlewareHandler<{ Variables: AuthVars }>;
 }
@@ -16,7 +16,7 @@ export function createCartRouter(deps: Deps): Hono {
 
   router.get('/', deps.accessAuthMiddleware, async c => {
     const userId = c.get('userId');
-    const data = await deps.queries.findById(userId);
+    const data = await deps.queries.findByUserId(userId);
     return c.json(data);
   });
 

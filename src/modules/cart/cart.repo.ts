@@ -5,16 +5,20 @@ import { Cart, cartSchema, CartWithRelations } from '@/shared/db/schema/cart.sch
 
 export interface ICartRepository {
   create(userId: string): Promise<Cart>;
-  findById(id: string): Promise<CartWithRelations | undefined>;
+  findByUserId(id: string): Promise<CartWithRelations | undefined>;
   update(cart: Partial<Omit<Cart, 'id'>>): Promise<Cart>;
 }
 
 export class CartRepository implements ICartRepository {
-  public async findById(id: string): Promise<CartWithRelations | undefined> {
+  public async findByUserId(userId: string): Promise<CartWithRelations | undefined> {
     return await db.query.cartSchema.findFirst({
-      where: eq(cartSchema.id, id),
+      where: eq(cartSchema.userId, userId),
       with: {
-        cartItems: true,
+        cartItems: {
+          with: {
+            product: true,
+          },
+        },
       },
     });
   }

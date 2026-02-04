@@ -1,5 +1,4 @@
 import { Cart } from '@/shared/db/schema/cart.schema';
-import { Product } from '@/shared/db/schema/product.schema';
 
 import { ProductQueries } from '../product/product.queries';
 
@@ -12,7 +11,7 @@ interface Deps {
   productQueries: ProductQueries;
 }
 
-export class CardCommands {
+export class CartCommands {
   constructor(private readonly deps: Deps) {}
 
   public create(userId: string) {
@@ -24,11 +23,11 @@ export class CardCommands {
   }
 
   private async findOrCreateCart(userId: string) {
-    let cart = await this.deps.cartRepo.findById(userId);
+    let cart = await this.deps.cartRepo.findByUserId(userId);
 
     if (!cart) {
       const createdCart = await this.create(userId);
-      cart = await this.deps.cartRepo.findById(createdCart.id);
+      cart = await this.deps.cartRepo.findByUserId(createdCart.id);
     }
 
     return cart;
@@ -59,7 +58,7 @@ export class CardCommands {
       quantity: 1,
     });
 
-    return await this.deps.cartRepo.findById(userId);
+    return await this.deps.cartRepo.findByUserId(userId);
   }
 
   public async removeItem(userId: string, cartItemId: string) {
@@ -77,7 +76,7 @@ export class CardCommands {
 
     await this.deps.cartItemCommands.delete(cartItem.id);
 
-    return await this.deps.cartRepo.findById(userId);
+    return await this.deps.cartRepo.findByUserId(userId);
   }
 
   public async decrementItem(userId: string, cartItemId: string) {
@@ -101,6 +100,6 @@ export class CardCommands {
       await this.deps.cartItemCommands.delete(cartItem.id);
     }
 
-    return await this.deps.cartRepo.findById(userId);
+    return await this.deps.cartRepo.findByUserId(userId);
   }
 }
