@@ -14,7 +14,6 @@ type CreateAuthModuleDeps = {
   userCommands: UserCommands;
   userQueries: UserQueries;
 };
-
 export function createAuthModule(deps: CreateAuthModuleDeps): CreateModuleResult<AuthCommands> {
   const jwtConfig = new JwtConfig();
   const tokenRepo = new TokenRepo();
