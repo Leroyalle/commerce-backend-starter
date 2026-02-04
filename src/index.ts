@@ -6,6 +6,7 @@ import { createProductModule } from './modules/product/product.module';
 import { createProductRouter } from './modules/product/product.router';
 import { createUserModule } from './modules/user/user.module';
 import { createUserRouter } from './modules/user/user.router';
+import { authMiddleware } from './shared/middlewares/auth.middleware';
 
 const app = new Hono();
 
@@ -16,10 +17,12 @@ const authModule = createAuthModule({
 });
 const productModule = createProductModule();
 
+const accessAuthMiddleware = authMiddleware(authModule.commands.verifyToken);
+
 const userRouter = createUserRouter({
   commands: userModule.commands,
   queries: userModule.queries,
-  verifyToken: authModule.commands.verifyToken,
+  accessAuthMiddleware,
 });
 
 const productRouter = createProductRouter({

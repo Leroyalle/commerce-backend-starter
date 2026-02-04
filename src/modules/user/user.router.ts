@@ -1,8 +1,6 @@
-import { Hono } from 'hono';
-import { JWTHeaderParameters, JWTPayload } from 'jose';
+import { Hono, MiddlewareHandler } from 'hono';
 
-import { authMiddleware } from '@/shared/middlewares/auth.middleware';
-import { AccessPayload, RefreshPayload } from '@/shared/types/token-payload.type';
+import { AuthVars } from '@/shared/types/auth-variables.type';
 
 import { UserCommands } from './user.commands';
 import { UserQueries } from './user.queries';
@@ -10,19 +8,13 @@ import { UserQueries } from './user.queries';
 type CreateUserRouterDeps = {
   commands: UserCommands;
   queries: UserQueries;
-  verifyToken: <T extends 'access' | 'refresh'>(
-    token: string,
-    type: T,
-  ) => Promise<{
-    payload: JWTPayload & (T extends 'access' ? AccessPayload : RefreshPayload);
-    protectedHeader: JWTHeaderParameters;
+  accessAuthMiddleware: MiddlewareHandler<{
+    Variables: AuthVars;
   }>;
 };
 
 export function createUserRouter(deps: CreateUserRouterDeps): Hono {
   const userRouter = new Hono();
-
-  const requireAuth = authMiddleware(deps.verifyToken);
 
   userRouter.get('/:id', c => {
     const id = c.req.param('id');
@@ -30,7 +22,7 @@ export function createUserRouter(deps: CreateUserRouterDeps): Hono {
     return c.json(data);
   });
 
-  userRouter.get('/me', requireAuth, c => {
+  userRouter.get('/me', deps.accessAuthMiddleware, c => {
     const id = c.get('userId');
     const data = deps.queries.findById(id);
     return c.json(data);
