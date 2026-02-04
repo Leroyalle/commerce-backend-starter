@@ -1,38 +1,38 @@
 // @ts-check
-import tsParser from "@typescript-eslint/parser";
-import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 
 export default [
   {
-    ignores: ["eslint.config.mjs"],
+    ignores: ['eslint.config.mjs'],
   },
 
   {
-    files: ["**/*.ts"],
+    files: ['**/*.ts'],
     languageOptions: {
       parser: tsParser,
     },
     plugins: {
-      "@typescript-eslint": tsPlugin,
+      '@typescript-eslint': tsPlugin,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
         {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
         },
       ],
 
-      "@typescript-eslint/explicit-member-accessibility": [
-        "error",
+      '@typescript-eslint/explicit-member-accessibility': [
+        'error',
         {
-          accessibility: "explicit",
+          accessibility: 'explicit',
           overrides: {
-            accessors: "off",
-            constructors: "off",
-            methods: "explicit",
-            properties: "off",
+            accessors: 'off',
+            constructors: 'off',
+            methods: 'explicit',
+            properties: 'off',
           },
         },
       ],
