@@ -19,6 +19,7 @@ export const userSchema = pgTable('users', {
 export const userRelation = relations(userSchema, ({ many, one }) => ({
   refreshTokens: many(refreshTokenSchema),
   cart: one(cartSchema),
+  orders: many(refreshTokenSchema),
 }));
 
 export type User = InferSelectModel<typeof userSchema>;
