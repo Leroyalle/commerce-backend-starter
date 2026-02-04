@@ -20,7 +20,11 @@ export function createUserModule(
   });
   const queries = new UserQueries({ userRepo });
 
-  const router = createUserRouter(commands, queries, deps.authCommands.verifyToken);
+  const router = createUserRouter({
+    commands,
+    queries,
+    verifyToken: deps.authCommands.verifyToken,
+  });
 
   return { commands, router, queries };
 }
