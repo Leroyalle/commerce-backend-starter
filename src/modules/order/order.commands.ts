@@ -7,7 +7,6 @@ import { IOrderRepository } from './order.repo';
 
 interface Deps {
   orderRepo: IOrderRepository;
-  cartCommands: CartCommands;
   cartQueries: CartQueries;
 }
 

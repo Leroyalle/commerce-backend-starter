@@ -8,7 +8,6 @@ import { OrderQueries } from './order.queries';
 import { OrderRepo } from './order.repo';
 
 interface Deps {
-  cartCommands: CartCommands;
   cartQueries: CartQueries;
 }
 
@@ -17,7 +16,6 @@ export function createOrderModule(deps: Deps): CreateModuleResult<OrderCommands,
   const queries = new OrderQueries({ orderRepo: repository });
   const commands = new OrderCommands({
     orderRepo: repository,
-    cartCommands: deps.cartCommands,
     cartQueries: deps.cartQueries,
   });
 
