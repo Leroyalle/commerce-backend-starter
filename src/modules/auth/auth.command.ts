@@ -69,4 +69,10 @@ export class AuthCommands {
     const accessToken = await this.deps.tokenService.sign(findUser, 'access');
     return { status: 'success', accessToken: accessToken.token };
   }
+
+  public verifyToken(token: string, type: 'access' | 'refresh') {
+    return this.deps.tokenCommands.verify(token, type);
+  }
+
+  public refresh() {}
 }

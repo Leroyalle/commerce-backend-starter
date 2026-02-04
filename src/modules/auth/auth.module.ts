@@ -18,7 +18,7 @@ export function createAuthModule(deps: CreateAuthModuleDeps): CreateModuleResult
   const jwtConfig = new JwtConfig();
   const tokenRepo = new TokenRepo();
   const tokenService = new TokenService(jwtConfig);
-  const tokenCommands = new TokenCommands({ tokenRepo });
+  const tokenCommands = new TokenCommands({ tokenRepo, tokenService });
   const authCommands = new AuthCommands({
     tokenCommands,
     tokenService,

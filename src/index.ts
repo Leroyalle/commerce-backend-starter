@@ -10,6 +10,7 @@ const authModule = createAuthModule({
   userCommands: userModule.commands,
   userQueries: userModule.queries,
 });
+
 app.route('/user', userModule.router);
 app.route('/auth', authModule.router);
 
