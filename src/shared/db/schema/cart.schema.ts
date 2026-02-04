@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { InferSelectModel, relations } from 'drizzle-orm';
 import { pgTable, uuid } from 'drizzle-orm/pg-core';
 
 import { userSchema } from './user.schema';
@@ -17,3 +17,5 @@ export const cartRelation = relations(cartSchema, ({ one }) => ({
     references: [userSchema.id],
   }),
 }));
+
+export type Cart = InferSelectModel<typeof cartSchema>;
