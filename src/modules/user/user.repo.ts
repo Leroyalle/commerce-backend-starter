@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 
-import { db } from '@/shared/db/client';
+import { db } from '@/shared/infrastructure/db/client';
 
-import { User, userSchema } from '../../shared/db/schema/user.schema';
+import { User, userSchema } from '../../shared/infrastructure/db/schema/user.schema';
 
 export interface IUserRepository {
   findById(id: string): Promise<User | null>;

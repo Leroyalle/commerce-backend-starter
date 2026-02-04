@@ -1,4 +1,4 @@
-import { CartItem } from '@/shared/db/schema/cart-item.schema';
+import { CartItem } from '@/shared/infrastructure/db/schema/cart-item.schema';
 
 import { ICartItemRepository } from './cart-item.repo';
 

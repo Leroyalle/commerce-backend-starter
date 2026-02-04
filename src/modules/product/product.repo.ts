@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
-import { db } from '@/shared/db/client';
-import { Product, productSchema } from '@/shared/db/schema/product.schema';
+import { db } from '@/shared/infrastructure/db/client';
+import { Product, productSchema } from '@/shared/infrastructure/db/schema/product.schema';
 
 export interface IProductRepository {
   create(data: { name: string; price: number }): Promise<Product>;

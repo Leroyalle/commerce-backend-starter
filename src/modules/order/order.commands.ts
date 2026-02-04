@@ -1,4 +1,4 @@
-import { Order } from '@/shared/db/schema/order.schema';
+import { Order } from '@/shared/infrastructure/db/schema/order.schema';
 
 import { CartQueries } from '../cart/cart.queries';
 

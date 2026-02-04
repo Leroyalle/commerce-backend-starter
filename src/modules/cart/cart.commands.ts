@@ -1,4 +1,4 @@
-import { Cart } from '@/shared/db/schema/cart.schema';
+import { Cart } from '@/shared/infrastructure/db/schema/cart.schema';
 
 import { ProductQueries } from '../product/product.queries';
 

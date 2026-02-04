@@ -1,6 +1,6 @@
 import { jwtVerify, SignJWT } from 'jose';
 
-import { RoleEnum } from '@/shared/db/schema/user.schema';
+import { RoleEnum } from '@/shared/infrastructure/db/schema/user.schema';
 import {
   AccessPayload,
   AuthTokensPayload,

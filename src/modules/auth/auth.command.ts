@@ -1,6 +1,6 @@
 import * as argon2 from 'argon2';
 
-import { User } from '@/shared/db/schema/user.schema';
+import { User } from '@/shared/infrastructure/db/schema/user.schema';
 
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';

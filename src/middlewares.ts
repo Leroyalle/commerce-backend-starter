@@ -1,7 +1,6 @@
 import { JWTHeaderParameters, JWTPayload } from 'jose';
 
-import { accessAuthMiddleware } from '@/shared/middlewares/access-auth.middleware';
-
+import { accessAuthMiddleware } from './shared/infrastructure/middlewares/access-auth.middleware';
 import { AccessPayload, RefreshPayload } from './shared/types/token-payload.type';
 
 export function createMiddlewares(authCommands: {

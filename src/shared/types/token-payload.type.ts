@@ -1,4 +1,4 @@
-import { RoleEnum } from '../db/schema/user.schema';
+import { RoleEnum } from '../infrastructure/db/schema/user.schema';
 
 export type AccessPayload = {
   type: 'access';

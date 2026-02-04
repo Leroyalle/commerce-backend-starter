@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
-import { db } from '@/shared/db/client';
-import { Order, orderSchema } from '@/shared/db/schema/order.schema';
+import { db } from '@/shared/infrastructure/db/client';
+import { Order, orderSchema } from '@/shared/infrastructure/db/schema/order.schema';
 
 export interface IOrderRepository {
   create(data: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Promise<Order>;

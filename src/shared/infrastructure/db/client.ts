@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 
-import { getEnv } from '../lib/helpers/get-env.helper';
+import { getEnv } from '../../lib/helpers/get-env.helper';
 
 import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 
-import { User } from '@/shared/db/schema/user.schema';
+import { User } from '@/shared/infrastructure/db/schema/user.schema';
 
 import { AuthCommands } from './auth.command';
 

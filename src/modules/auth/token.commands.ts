@@ -1,4 +1,4 @@
-import { RefreshToken } from '@/shared/db/schema/refresh-token.schema';
+import { RefreshToken } from '@/shared/infrastructure/db/schema/refresh-token.schema';
 
 import { TokenRepo } from './token.repo';
 import { TokenService } from './token.service';
