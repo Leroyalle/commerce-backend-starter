@@ -37,8 +37,7 @@ export class AuthCommands {
 
   public async register(input: Omit<User, 'id'>): Promise<RegisterResult> {
     const findUser = await this.deps.userQueries.findByEmail(input.email);
-    if (!findUser)
-      return { status: 'error', message: 'Пользователь с данным email уже существует' };
+    if (findUser) return { status: 'error', message: 'Пользователь с данным email уже существует' };
 
     const hashedPassword = await argon2.hash(input.password);
 
