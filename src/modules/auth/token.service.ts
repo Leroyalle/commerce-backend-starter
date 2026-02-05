@@ -19,9 +19,9 @@ type SignReturnValue<T extends keyof typeof timeMap> = {
 } & SignReturnMap[T];
 
 type SignReturnMap = {
-  refresh: { jwi: string; expAt: (typeof timeMap)['refresh'] };
+  refresh: { jwi: string; expAt: Date };
   access: {
-    expAt: (typeof timeMap)['access'];
+    expAt: Date;
   };
 };
 
@@ -40,6 +40,15 @@ export class TokenService {
     data: { id: string; role: RoleEnum },
     type: keyof typeof timeMap,
   ): Promise<SignReturnValue<'access'> | SignReturnValue<'refresh'>> {
+    const DAY = 24 * 60 * 60 * 1000;
+
+    const ttl = {
+      refresh: 30 + DAY,
+      access: 2 * 60 * 60 * 1000,
+    };
+
+    const expiresAt = new Date(Date.now() + ttl[type]);
+
     const payload: AuthTokensPayload =
       type === 'access'
         ? { type, sub: data.id, role: data.role }
@@ -56,14 +65,14 @@ export class TokenService {
     if (payload.type === 'access') {
       return {
         token,
-        expAt: timeMap[payload.type],
+        expAt: expiresAt,
       };
     }
 
     return {
       token,
       jwi: payload.jwi,
-      expAt: timeMap[payload.type],
+      expAt: expiresAt,
     };
   }
 
