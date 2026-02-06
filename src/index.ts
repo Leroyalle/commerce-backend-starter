@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 
 import { createMiddlewares } from './middlewares';
 import { createModules } from './modules';
@@ -8,7 +9,19 @@ import { createOrderRouter } from './modules/order/order.router';
 import { createProductRouter } from './modules/product/product.router';
 import { createUserRouter } from './modules/user/user.router';
 
-const app = new Hono();
+const app = new Hono().basePath('/api');
+
+app.use(
+  '*',
+  cors({
+    origin: 'http://localhost:5173',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    // allowHeaders: ['Content-Type', 'Authorization'],
+    // exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
 
 app.onError((err, c) => {
   console.error('ERROR MESSAGE:', err.message);
