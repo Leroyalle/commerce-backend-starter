@@ -18,4 +18,8 @@ export class TokenCommands {
   public async verify<T extends 'access' | 'refresh'>(token: string, type: T) {
     return await this.deps.tokenService.verify(token, type);
   }
+
+  public async findValidByUserId(userId: string) {
+    return await this.deps.tokenRepo.findValidByUserId(userId);
+  }
 }
