@@ -21,4 +21,11 @@ export class DataCounterRepository implements IDataCounterRepository {
       .set({ totalCount: sql`${dataCounterSchema.totalCount} + ${value}` })
       .where(eq(dataCounterSchema.tableName, tableName));
   }
+
+  public async getCount(tableName: string) {
+    const result = await this.deps.db
+      .select({ totalCount: dataCounterSchema.totalCount })
+      .from(dataCounterSchema)
+      .where(eq(dataCounterSchema.tableName, tableName));
+  }
 }
