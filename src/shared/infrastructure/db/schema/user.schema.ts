@@ -9,7 +9,7 @@ export const roleEnum = pgEnum('role', roles);
 
 export const userSchema = pgTable('users', {
   id: uuid().defaultRandom().primaryKey(),
-  username: text().notNull(),
+  name: text().notNull(),
   email: text().notNull().unique(),
   password: text().notNull(),
   phone: integer().notNull(),
