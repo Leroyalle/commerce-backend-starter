@@ -1,4 +1,4 @@
-import { and, eq, isNotNull } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
 import {
@@ -18,7 +18,7 @@ export class TokenRepo implements ITokenRepository {
 
   public async findValidByUserId(userId: string) {
     return await db.query.refreshTokenSchema.findFirst({
-      where: and(eq(refreshTokenSchema.userId, userId), isNotNull(refreshTokenSchema.revokedAt)),
+      where: and(eq(refreshTokenSchema.userId, userId), isNull(refreshTokenSchema.revokedAt)),
     });
   }
 }
