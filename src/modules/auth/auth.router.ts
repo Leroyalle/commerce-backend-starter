@@ -1,12 +1,16 @@
-import { Hono } from 'hono';
+import { Hono, MiddlewareHandler } from 'hono';
 import { setCookie } from 'hono/cookie';
 
 import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { RefreshAuthVars } from '@/shared/types/auth-variables.type';
 
 import { AuthCommands } from './auth.command';
 
 interface Deps {
   commands: AuthCommands;
+  refreshGuard: MiddlewareHandler<{
+    Variables: RefreshAuthVars;
+  }>;
 }
 export function createAuthRouter(deps: Deps): Hono {
   const authRouter = new Hono();
@@ -31,5 +35,13 @@ export function createAuthRouter(deps: Deps): Hono {
     if (result.status === 'error') return c.json(result, 400);
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
+
+  authRouter.post('/refresh', deps.refreshGuard, async c => {
+    const userId = c.get('userId');
+    const jti = c.get('jti');
+    const result = await deps.commands.refresh(userId, jti);
+    return c.json({ message: 'Токен обновлен!', accessToken: result.accessToken }, 201);
+  });
+
   return authRouter;
 }

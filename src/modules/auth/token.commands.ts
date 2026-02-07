@@ -22,4 +22,7 @@ export class TokenCommands {
   public async findValidByUserId(userId: string) {
     return await this.deps.tokenRepo.findValidByUserId(userId);
   }
+  public async findByJti(jti: string) {
+    return await this.deps.tokenRepo.findByJti(jti);
+  }
 }

@@ -9,7 +9,7 @@ export type AccessPayload = {
 export type RefreshPayload = {
   type: 'refresh';
   sub: string;
-  jwi: string;
+  jti: string;
 };
 
 export type AuthTokensPayload = AccessPayload | RefreshPayload;

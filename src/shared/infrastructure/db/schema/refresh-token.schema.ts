@@ -5,7 +5,7 @@ import { userSchema } from './user.schema';
 
 export const refreshTokenSchema = pgTable('refreshTokens', {
   id: uuid().defaultRandom().primaryKey(),
-  jwi: varchar().notNull(),
+  jti: varchar().notNull(),
   token: varchar().notNull(),
   expAt: timestamp({ withTimezone: false }).notNull(),
   revokedAt: timestamp({ withTimezone: false }),

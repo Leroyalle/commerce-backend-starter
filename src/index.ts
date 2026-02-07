@@ -40,15 +40,15 @@ app.onError((err, c) => {
 });
 
 const { auth, cart, order, product, user } = createModules();
-const { accessAuth } = createMiddlewares({ verifyToken: auth.commands.verifyToken });
+const { accessGuard, refreshGuard } = createMiddlewares({ authCommands: auth.commands });
 
 const userRouter = createUserRouter({
   commands: user.commands,
   queries: user.queries,
-  accessAuthMiddleware: accessAuth,
+  accessAuthMiddleware: accessGuard,
 });
 
-const authRouter = createAuthRouter({ commands: auth.commands });
+const authRouter = createAuthRouter({ commands: auth.commands, refreshGuard });
 
 const productRouter = createProductRouter({
   commands: product.commands,
@@ -58,13 +58,13 @@ const productRouter = createProductRouter({
 const cartRouter = createCartRouter({
   commands: cart.commands,
   queries: cart.queries,
-  accessAuthMiddleware: accessAuth,
+  accessAuthMiddleware: accessGuard,
 });
 
 const orderRouter = createOrderRouter({
   queries: order.queries,
   commands: order.commands,
-  accessAuthMiddleware: accessAuth,
+  accessAuthMiddleware: accessGuard,
 });
 
 app.route('/user', userRouter);

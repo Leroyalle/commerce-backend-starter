@@ -19,7 +19,7 @@ type SignReturnValue<T extends keyof typeof timeMap> = {
 } & SignReturnMap[T];
 
 type SignReturnMap = {
-  refresh: { jwi: string; expAt: Date };
+  refresh: { jti: string; expAt: Date };
   access: {
     expAt: Date;
   };
@@ -52,7 +52,7 @@ export class TokenService {
     const payload: AuthTokensPayload =
       type === 'access'
         ? { type, sub: data.id, role: data.role }
-        : { type, sub: data.id, jwi: crypto.randomUUID() };
+        : { type, sub: data.id, jti: crypto.randomUUID() };
 
     const token = await new SignJWT(payload)
       .setProtectedHeader({ alg: 'HS256' })
@@ -71,7 +71,7 @@ export class TokenService {
 
     return {
       token,
-      jwi: payload.jwi,
+      jti: payload.jti,
       expAt: expiresAt,
     };
   }

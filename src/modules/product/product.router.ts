@@ -13,7 +13,6 @@ export function createProductRouter(deps: Deps): Hono {
 
   productRouter.get('/', async c => {
     const data = await deps.queries.findAll();
-    console.log(data);
     return c.json(data);
   });
 

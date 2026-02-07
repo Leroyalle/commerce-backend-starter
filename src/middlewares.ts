@@ -1,20 +1,18 @@
-import { JWTHeaderParameters, JWTPayload } from 'jose';
-
+import { AuthCommands } from './modules/auth/auth.command';
 import { accessAuthMiddleware } from './shared/infrastructure/middlewares/access-auth.middleware';
-import { AccessPayload, RefreshPayload } from './shared/types/token-payload.type';
+import { refreshGuard } from './shared/infrastructure/middlewares/refresh-auth.guard';
 
-export function createMiddlewares(authCommands: {
-  verifyToken: <T extends 'access' | 'refresh'>(
-    token: string,
-    type: T,
-  ) => Promise<{
-    payload: JWTPayload & (T extends 'access' ? AccessPayload : RefreshPayload);
-    protectedHeader: JWTHeaderParameters;
-  }>;
-}) {
-  const accessAuth = accessAuthMiddleware(authCommands.verifyToken);
+interface Deps {
+  authCommands: AuthCommands;
+}
+
+export function createMiddlewares(deps: Deps) {
+  const accessAuthGuard = accessAuthMiddleware(deps.authCommands.verifyToken);
+
+  const refreshTokenGuard = refreshGuard(deps.authCommands);
 
   return {
-    accessAuth,
+    accessGuard: accessAuthGuard,
+    refreshGuard: refreshTokenGuard,
   };
 }

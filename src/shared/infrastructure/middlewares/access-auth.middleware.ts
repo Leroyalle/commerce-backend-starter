@@ -2,8 +2,8 @@ import { MiddlewareHandler } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { JWTHeaderParameters, JWTPayload } from 'jose';
 
-import { AuthVars } from '../types/auth-variables.type';
-import { AccessPayload, RefreshPayload } from '../types/token-payload.type';
+import { AuthVars } from '@/shared/types/auth-variables.type';
+import { AccessPayload, RefreshPayload } from '@/shared/types/token-payload.type';
 
 export function accessAuthMiddleware(
   verifyToken: <T extends 'access' | 'refresh'>(

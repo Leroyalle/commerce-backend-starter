@@ -49,7 +49,7 @@ export class AuthCommands {
     await this.deps.tokenCommands.create({
       token: refreshToken.token,
       userId: createdUser.id,
-      jwi: refreshToken.jwi,
+      jti: refreshToken.jti,
       expAt: refreshToken.expAt,
       revokedAt: null,
     });
@@ -69,9 +69,28 @@ export class AuthCommands {
     return { status: 'success', accessToken: accessToken.token };
   }
 
-  public verifyToken<T extends 'access' | 'refresh'>(token: string, type: T) {
-    return this.deps.tokenCommands.verify(token, type);
+  public async verifyToken<T extends 'access' | 'refresh'>(token: string, type: T) {
+    return await this.deps.tokenCommands.verify(token, type);
   }
 
-  public refresh() {}
+  public async refresh(userId: string, jti: string) {
+    const user = await this.deps.userQueries.findById(userId);
+
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+
+    const refreshToken = await this.deps.tokenCommands.findByJti(jti);
+
+    if (!refreshToken) {
+      throw new Error('Токен не найден');
+    }
+
+    const accessToken = await this.deps.tokenService.sign(user, 'access');
+    return { accessToken: accessToken.token };
+  }
+
+  public async findByJti(jti: string) {
+    return await this.deps.tokenCommands.findByJti(jti);
+  }
 }
