@@ -1,15 +1,15 @@
 import { eq, sql } from 'drizzle-orm';
-import { DrizzleD1Database } from 'drizzle-orm/d1';
 
-import { DB, db } from '@/shared/infrastructure/db/client';
+import { DB } from '@/shared/infrastructure/db/client';
 import { dataCounterSchema } from '@/shared/infrastructure/db/schema/data-counter.schema';
 
 interface Deps {
   db: DB;
 }
 
-interface IDataCounterRepository {
-  updateCount: (type: 'increment' | 'decrement', tableName: string, tx: DB) => void;
+export interface IDataCounterRepository {
+  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => void;
+  getCount: (tableName: string) => Promise<number>;
 }
 
 export class DataCounterRepository implements IDataCounterRepository {
