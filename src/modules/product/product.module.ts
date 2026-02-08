@@ -2,7 +2,6 @@ import Redis from 'ioredis';
 
 import { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
-import { IDataCounterCommands } from '../data-counter/data-counter.commands';
 import { IDataCounterQueries } from '../data-counter/data-counter.queries';
 
 import { ProductCommands } from './product.commands';

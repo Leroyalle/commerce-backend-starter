@@ -6,11 +6,12 @@ import { createProductModule } from './modules/product/product.module';
 import { createTelegramModule } from './modules/telegram/telegram.module';
 import { createUserModule } from './modules/user/user.module';
 import { db } from './shared/infrastructure/db/client';
+import { redis } from './shared/infrastructure/redis/client';
 
 export function createModules() {
   const telegram = createTelegramModule();
 
-  const dataCounter = createDataCounterModule({ db });
+  const dataCounter = createDataCounterModule({ db: db });
 
   const user = createUserModule();
 
@@ -18,7 +19,7 @@ export function createModules() {
     userCommands: user.commands,
     userQueries: user.queries,
   });
-  const product = createProductModule();
+  const product = createProductModule({ dataCounterQueries: dataCounter.queries, redis: redis });
 
   const cart = createCartModule({ productQueries: product.queries });
 
@@ -35,5 +36,6 @@ export function createModules() {
     cart,
     order,
     telegram,
+    dataCounter,
   };
 }

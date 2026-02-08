@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
 
 import { ProductCommands } from './product.commands';
-import { ProductQueries } from './product.queries';
+import { IProductQueries } from './product.queries';
 
 interface Deps {
   commands: ProductCommands;
-  queries: ProductQueries;
+  queries: IProductQueries;
 }
 
 export function createProductRouter(deps: Deps): Hono {
