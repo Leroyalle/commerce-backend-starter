@@ -1,4 +1,5 @@
 import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { IPaginationResult } from '@/shared/types/pagination-result.type';
 import { IPagination } from '@/shared/types/pagination.type';
 
 import { IProductRepository } from './product.repo';
@@ -8,7 +9,7 @@ interface Deps {
 }
 
 export interface IProductQueries {
-  findAll(pagination?: IPagination): Promise<Product[]>;
+  findAll(pagination?: IPagination): Promise<IPaginationResult<Product>>;
   findById(id: string): Promise<Product>;
 }
 

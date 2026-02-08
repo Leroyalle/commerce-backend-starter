@@ -4,7 +4,11 @@ interface Deps {
   repository: IDataCounterRepository;
 }
 
-export class DataCounterQueries {
+export interface IDataCounterQueries {
+  getCount: (tableName: string) => Promise<number>;
+}
+
+export class DataCounterQueries implements IDataCounterQueries {
   constructor(private readonly deps: Deps) {}
 
   public getCount(tableName: string) {

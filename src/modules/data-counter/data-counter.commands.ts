@@ -6,7 +6,11 @@ interface Deps {
   repository: IDataCounterRepository;
 }
 
-export class DataCounterCommands {
+export interface IDataCounterCommands {
+  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => void;
+}
+
+export class DataCounterCommands implements IDataCounterCommands {
   constructor(private readonly deps: Deps) {}
 
   public updateCount(type: 'increment' | 'decrement', tableName: string, tx?: DB) {
