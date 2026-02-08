@@ -1,6 +1,7 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
 import { pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
+import { pgTimestamp } from './timestamp';
 import { userSchema } from './user.schema';
 
 export const refreshTokenSchema = pgTable('refreshTokens', {
@@ -12,6 +13,7 @@ export const refreshTokenSchema = pgTable('refreshTokens', {
   userId: uuid()
     .notNull()
     .references(() => userSchema.id, { onDelete: 'cascade' }),
+  ...pgTimestamp,
 });
 
 export const refreshTokenRelation = relations(refreshTokenSchema, ({ one }) => ({

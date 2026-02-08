@@ -1,6 +1,6 @@
 import { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
-import { ProductQueries } from '../product/product.queries';
+import { IProductQueries } from '../product/product.queries';
 
 import { CartItemCommands } from './cart-item/cart-item.commands';
 import { CartItemRepo } from './cart-item/cart-item.repo';
@@ -9,7 +9,7 @@ import { CartQueries } from './cart.queries';
 import { CartRepository } from './cart.repo';
 
 interface Deps {
-  productQueries: ProductQueries;
+  productQueries: IProductQueries;
 }
 
 export function createCartModule(deps: Deps): CreateModuleResult<CartCommands, CartQueries> {

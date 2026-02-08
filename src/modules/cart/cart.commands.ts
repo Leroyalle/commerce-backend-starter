@@ -1,6 +1,6 @@
 import { Cart } from '@/shared/infrastructure/db/schema/cart.schema';
 
-import { ProductQueries } from '../product/product.queries';
+import { IProductQueries } from '../product/product.queries';
 
 import { CartItemCommands } from './cart-item/cart-item.commands';
 import { ICartRepository } from './cart.repo';
@@ -8,7 +8,7 @@ import { ICartRepository } from './cart.repo';
 interface Deps {
   cartRepo: ICartRepository;
   cartItemCommands: CartItemCommands;
-  productQueries: ProductQueries;
+  productQueries: IProductQueries;
 }
 
 export class CartCommands {

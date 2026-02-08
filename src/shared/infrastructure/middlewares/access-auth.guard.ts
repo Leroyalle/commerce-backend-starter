@@ -5,7 +5,7 @@ import { JWTHeaderParameters, JWTPayload } from 'jose';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 import { AccessPayload, RefreshPayload } from '@/shared/types/token-payload.type';
 
-export function accessAuthMiddleware(
+export function accessAuthGuard(
   verifyToken: <T extends 'access' | 'refresh'>(
     token: string,
     type: T,

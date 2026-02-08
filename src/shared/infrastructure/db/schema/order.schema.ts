@@ -2,6 +2,7 @@ import { InferSelectModel, relations } from 'drizzle-orm';
 import { customType, integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { CartItem, CartItemWithRelations } from './cart-item.schema';
+import { pgTimestamp } from './timestamp';
 import { userSchema } from './user.schema';
 
 const jsonbConfig = customType<{ data: CartItem[] }>({
@@ -22,9 +23,7 @@ export const orderSchema = pgTable('orders', {
   phone: integer().notNull(),
   totalAmount: integer().notNull(),
   items: jsonbConfig().$type<Omit<CartItemWithRelations, 'cart' | 'productId'>[]>().notNull(),
-
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  ...pgTimestamp,
 });
 
 export const orderRelations = relations(orderSchema, ({ one }) => ({

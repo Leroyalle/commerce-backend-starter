@@ -3,6 +3,7 @@ import { integer, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { cartSchema } from './cart.schema';
 import { refreshTokenSchema } from './refresh-token.schema';
+import { pgTimestamp } from './timestamp';
 
 export const roles = ['user', 'admin'] as const;
 export const roleEnum = pgEnum('role', roles);
@@ -14,6 +15,7 @@ export const userSchema = pgTable('users', {
   password: text().notNull(),
   phone: integer().notNull(),
   role: roleEnum().notNull(),
+  ...pgTimestamp,
 });
 
 export const userRelation = relations(userSchema, ({ many, one }) => ({

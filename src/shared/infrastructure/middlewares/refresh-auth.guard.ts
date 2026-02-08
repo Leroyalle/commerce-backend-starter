@@ -24,7 +24,6 @@ export function refreshGuard(
 
     c.set('jti', payload.jti);
     c.set('userId', payload.sub);
-    // c.set('role', payload.role);
 
     return next();
   };
