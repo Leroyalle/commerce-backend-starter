@@ -6,6 +6,7 @@ import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import { ProductCommands } from './product.commands';
 import { IProductQueries } from './product.queries';
 import { createProductZodSchema } from './schemas/create-product.schema';
+import { searchProductZodSchema } from './schemas/search.schema';
 
 interface Deps {
   commands: ProductCommands;
@@ -15,8 +16,9 @@ interface Deps {
 export function createProductRouter(deps: Deps): Hono {
   const productRouter = new Hono();
 
-  productRouter.get('/', async c => {
-    const data = await deps.queries.findAll();
+  productRouter.get('/', zValidator('query', searchProductZodSchema), async c => {
+    const query = c.req.valid('query');
+    const data = await deps.queries.findAll(query);
     return c.json(data);
   });
 
