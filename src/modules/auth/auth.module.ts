@@ -4,10 +4,10 @@ import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
 
 import { AuthCommands } from './auth.command';
-import { JwtConfig } from './jwt.config';
-import { TokenCommands } from './token.commands';
-import { TokenRepo } from './token.repo';
-import { TokenService } from './token.service';
+import { JwtConfig } from './token/jwt.config';
+import { TokenCommands } from './token/token.commands';
+import { TokenRepo } from './token/token.repo';
+import { TokenService } from './token/token.service';
 
 type CreateAuthModuleDeps = {
   userCommands: UserCommands;

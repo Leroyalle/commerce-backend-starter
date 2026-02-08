@@ -5,8 +5,8 @@ import { User } from '@/shared/infrastructure/db/schema/user.schema';
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
 
-import { TokenCommands } from './token.commands';
-import { TokenService } from './token.service';
+import { TokenCommands } from './token/token.commands';
+import { TokenService } from './token/token.service';
 
 type RegisterResult = SuccessRegisterResult | ErrorAuthResult;
 type LoginResult = SuccessLoginResult | ErrorAuthResult;
