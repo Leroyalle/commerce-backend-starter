@@ -41,5 +41,11 @@ export function createCartRouter(deps: Deps): Hono {
     return c.json(data);
   });
 
+  router.delete('/', deps.accessAuthMiddleware, async c => {
+    const userId = c.get('userId');
+    const data = await deps.commands.clearCart(userId);
+    return c.json(data);
+  });
+
   return router;
 }

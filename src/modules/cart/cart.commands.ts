@@ -102,4 +102,8 @@ export class CartCommands {
 
     return await this.deps.cartRepo.findByUserId(userId);
   }
+
+  public async clearCart(userId: string) {
+    return await this.deps.cartRepo.clear(userId);
+  }
 }

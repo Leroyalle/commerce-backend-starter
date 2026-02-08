@@ -7,6 +7,7 @@ export interface ICartRepository {
   create(userId: string): Promise<Cart>;
   findByUserId(id: string): Promise<CartWithRelations | undefined>;
   update(cart: Partial<Omit<Cart, 'id'>>): Promise<Cart>;
+  clear(userId: string): Promise<void>;
 }
 
 export class CartRepository implements ICartRepository {
@@ -29,5 +30,9 @@ export class CartRepository implements ICartRepository {
 
   public async update(cart: Partial<Omit<Cart, 'id'>>): Promise<Cart> {
     return (await db.update(cartSchema).set(cart).returning())[0];
+  }
+
+  public async clear(userId: string): Promise<void> {
+    await db.delete(cartSchema).where(eq(cartSchema.userId, userId));
   }
 }
