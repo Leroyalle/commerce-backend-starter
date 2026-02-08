@@ -13,7 +13,7 @@ export interface ITokenRepository {
 }
 
 export class TokenRepo implements ITokenRepository {
-  public async create(token: Omit<RefreshToken, 'id'>) {
+  public async create(token: Omit<RefreshToken, 'id' | 'createdAt' | 'updatedAt'>) {
     return (await db.insert(refreshTokenSchema).values(token).returning())[0];
   }
 

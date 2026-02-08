@@ -11,7 +11,7 @@ type TokenCommandsDeps = {
 export class TokenCommands {
   constructor(private readonly deps: TokenCommandsDeps) {}
 
-  public async create(token: Omit<RefreshToken, 'id'>) {
+  public async create(token: Omit<RefreshToken, 'id' | 'createdAt' | 'updatedAt'>) {
     return await this.deps.tokenRepo.create(token);
   }
 
