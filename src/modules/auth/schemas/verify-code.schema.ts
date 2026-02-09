@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export const verifyEmailCodeZodSchema = z.object({
-  code: z.coerce.number().min(4).max(4),
+  code: z.coerce.number().min(1000).max(9999),
   email: z.email(),
 });
 
