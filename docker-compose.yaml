@@ -1,11 +1,11 @@
 services:
-  backend:
-    build: .
-    container_name: electronic_api
-    depends_on:
-      - postgres
-      - redis
-      - meilisearch
+  # backend:
+  #   build: .
+  #   container_name: electronic_api
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - meilisearch
 
   meilisearch:
     image: getmeili/meilisearch:latest
@@ -20,7 +20,8 @@ services:
   redis:
     image: 'redis:latest'
     container_name: 'electronic-redis'
-    command: redis-server --user ${REDIS_USER} on >${REDIS_PASSWORD} ~* +@all
+    command:
+      ['redis-server', '--user', '${REDIS_USER}', 'on', '>${REDIS_PASSWORD}', '~*', '&*', '+@all']
     ports:
       - 6777:6379
     volumes:
