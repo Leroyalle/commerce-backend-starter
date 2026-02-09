@@ -2,7 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono, MiddlewareHandler } from 'hono';
 import { setCookie } from 'hono/cookie';
 
-import { RefreshAuthVars } from '@/shared/types/auth-variables.type';
+import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
 
 import { AuthCommands } from './auth.commands';
 import { loginZodSchema } from './schemas/login.schema';
@@ -17,6 +17,7 @@ interface Deps {
   refreshGuard: MiddlewareHandler<{
     Variables: RefreshAuthVars;
   }>;
+  accessGuard: MiddlewareHandler<{ Variables: AuthVars }>;
 }
 export function createAuthRouter(deps: Deps): Hono {
   const authRouter = new Hono();
@@ -49,27 +50,39 @@ export function createAuthRouter(deps: Deps): Hono {
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
 
-  authRouter.post('/reset-password', zValidator('json', loginZodSchema), async c => {
-    const body = c.req.valid('json');
-    await deps.commands.resetPassword(body.email, body.password);
-    return c.json(
-      {
-        message: 'Письмо с кодом подтверждения отправлено на ваш email',
-      },
-      201,
-    );
-  });
+  authRouter.post(
+    '/reset-password',
+    deps.accessGuard,
+    zValidator('json', loginZodSchema),
+    async c => {
+      const body = c.req.valid('json');
+      const userId = c.get('userId');
+      await deps.commands.resetPassword(userId, body.password);
+      return c.json(
+        {
+          message: 'Письмо с кодом подтверждения отправлено на ваш email',
+        },
+        201,
+      );
+    },
+  );
 
-  authRouter.post('/verify-password', zValidator('json', verifyPasswordCodeZodSchema), async c => {
-    const body = c.req.valid('json');
-    await deps.commands.verifyPasswordCode(body.email, body.code, body.newPassword);
-    return c.json(
-      {
-        message: 'Пароль успешно изменен!',
-      },
-      201,
-    );
-  });
+  authRouter.post(
+    '/verify-password',
+    deps.accessGuard,
+    zValidator('json', verifyPasswordCodeZodSchema),
+    async c => {
+      const body = c.req.valid('json');
+      const userId = c.get('userId');
+      await deps.commands.verifyPasswordCode(userId, body.code, body.newPassword);
+      return c.json(
+        {
+          message: 'Пароль успешно изменен!',
+        },
+        201,
+      );
+    },
+  );
 
   authRouter.post('/refresh', deps.refreshGuard, async c => {
     const userId = c.get('userId');

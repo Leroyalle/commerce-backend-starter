@@ -37,8 +37,8 @@ export interface Deps {
 export class AuthCommands {
   constructor(private readonly deps: Deps) {}
 
-  public async resetPassword(email: string, newPassword: string) {
-    const findUser = await this.deps.userQueries.findByEmail(email);
+  public async resetPassword(userId: string, newPassword: string) {
+    const findUser = await this.deps.userQueries.findById(userId);
     if (!findUser) throw new Error('Пользователь не найден');
     if (findUser.isVerified) throw new Error('Пользователь уже верифицирован');
     const isSame = await argon2.verify(findUser.password, newPassword);
@@ -55,8 +55,8 @@ export class AuthCommands {
     return { success: true };
   }
 
-  public async verifyPasswordCode(email: string, code: number, newPassword: string) {
-    const findUser = await this.deps.userQueries.findByEmail(email);
+  public async verifyPasswordCode(userId: string, code: number, newPassword: string) {
+    const findUser = await this.deps.userQueries.findById(userId);
 
     if (!findUser) throw new Error('Пользователь не найден');
 
