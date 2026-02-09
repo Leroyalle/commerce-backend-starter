@@ -7,6 +7,7 @@ import { RefreshAuthVars } from '@/shared/types/auth-variables.type';
 import { AuthCommands } from './auth.command';
 import { loginZodSchema } from './schemas/login.schema';
 import { registerZodSchema } from './schemas/register.schema';
+import { verifyCodeZodSchema } from './schemas/verify-code.schema';
 
 interface Deps {
   commands: AuthCommands;
@@ -19,8 +20,13 @@ export function createAuthRouter(deps: Deps): Hono {
 
   authRouter.post('/register', zValidator('json', registerZodSchema), async c => {
     const body = c.req.valid('json');
-    const result = await deps.commands.register(body);
-    if (result.status === 'error') return c.json(result, 400);
+    await deps.commands.register(body);
+    return c.json({ message: 'Код отправлен на ваш email! Не забудьте проверить папку спам' }, 201);
+  });
+
+  authRouter.post('/verify-email', zValidator('json', verifyCodeZodSchema), async c => {
+    const body = c.req.valid('json');
+    const result = await deps.commands.verifyCode(body.email, body.code);
     setCookie(c, 'refreshToken', result.refreshToken, {
       httpOnly: true,
       // secure: true,
@@ -28,13 +34,15 @@ export function createAuthRouter(deps: Deps): Hono {
       path: '/',
       maxAge: 60 * 60 * 24 * 30,
     });
-    return c.json({ message: 'Регистрация прошла успешно!', accessToken: result.accessToken }, 201);
+    return c.json(
+      { message: 'Регистрация прошла успешно! Добро пожаловать!', accessToken: result.accessToken },
+      201,
+    );
   });
 
   authRouter.post('/login', zValidator('json', loginZodSchema), async c => {
     const body = c.req.valid('json');
     const result = await deps.commands.login(body);
-    if (result.status === 'error') return c.json(result, 400);
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
 

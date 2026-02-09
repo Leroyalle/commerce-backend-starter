@@ -21,10 +21,11 @@ export function createModules() {
   const auth = createAuthModule({
     userCommands: user.commands,
     userQueries: user.queries,
+    redis,
   });
   const product = createProductModule({
     dataCounterQueries: dataCounter.queries,
-    redis: redis,
+    redis,
     searchIndex: meilisearch.indexes.productIndex,
   });
 

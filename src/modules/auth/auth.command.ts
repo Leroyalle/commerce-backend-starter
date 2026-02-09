@@ -1,15 +1,19 @@
 import * as argon2 from 'argon2';
+import { Queue } from 'bullmq';
 
 import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { TAuthQueuePayload } from '@/shared/types/auth-queue-payload.type';
 
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
 
+import { CodeCommands } from './code/code.commands';
+import { CodeQueries } from './code/code.queries';
 import { TokenCommands } from './token/token.commands';
 import { TokenService } from './token/token.service';
 
-type RegisterResult = SuccessRegisterResult | ErrorAuthResult;
-type LoginResult = SuccessLoginResult | ErrorAuthResult;
+type RegisterResult = SuccessRegisterResult;
+type LoginResult = SuccessLoginResult;
 
 type SuccessLoginResult = {
   status: 'success';
@@ -20,37 +24,42 @@ type SuccessRegisterResult = SuccessLoginResult & {
   refreshToken: string;
 };
 
-type ErrorAuthResult = {
-  status: 'error';
-  message: string;
-};
-
 export interface AuthCommandsDeps {
   userQueries: UserQueries;
   userCommands: UserCommands;
   tokenService: TokenService;
   tokenCommands: TokenCommands;
+  codeCommands: CodeCommands;
+  codeQueries: CodeQueries;
+  authProducer: Queue<TAuthQueuePayload['data'], any, TAuthQueuePayload['name']>;
 }
 
 export class AuthCommands {
   constructor(private readonly deps: AuthCommandsDeps) {}
 
-  public async register(
-    input: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'role'>,
-  ): Promise<RegisterResult> {
-    const findUser = await this.deps.userQueries.findByEmail(input.email);
-    if (findUser) return { status: 'error', message: 'Пользователь с данным email уже существует' };
+  public async verifyCode(email: string, code: number): Promise<RegisterResult> {
+    const findUser = await this.deps.userQueries.findByEmail(email);
 
-    const hashedPassword = await argon2.hash(input.password);
+    if (!findUser) throw new Error('Пользователь не найден');
 
-    const createdUser = await this.deps.userCommands.create({ ...input, password: hashedPassword });
+    if (findUser.isVerified) throw new Error('Пользователь уже верифицирован');
 
-    const accessToken = await this.deps.tokenService.sign(createdUser, 'access');
-    const refreshToken = await this.deps.tokenService.sign(createdUser, 'refresh');
+    const findCode = await this.deps.codeQueries.findByUserId({
+      userId: findUser.id,
+      type: 'verify_email',
+    });
+
+    if (!findCode) throw new Error('Код не найден');
+    if (parseInt(findCode) !== code) throw new Error('Неверный код');
+
+    await this.deps.userCommands.update(findUser.id, { isVerified: true });
+
+    const accessToken = await this.deps.tokenService.sign(findUser, 'access');
+    const refreshToken = await this.deps.tokenService.sign(findUser, 'refresh');
 
     await this.deps.tokenCommands.create({
       token: refreshToken.token,
-      userId: createdUser.id,
+      userId: findUser.id,
       jti: refreshToken.jti,
       expAt: refreshToken.expAt,
       revokedAt: null,
@@ -59,13 +68,45 @@ export class AuthCommands {
     return { status: 'success', accessToken: accessToken.token, refreshToken: refreshToken.token };
   }
 
+  public async register(
+    input: Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'role' | 'isVerified'>,
+  ): Promise<{ status: 'success' }> {
+    const findUser = await this.deps.userQueries.findByEmail(input.email);
+    if (findUser) throw new Error('Пользователь уже зарегистрирован');
+
+    const hashedPassword = await argon2.hash(input.password);
+
+    const createdUser = await this.deps.userCommands.create({
+      ...input,
+      password: hashedPassword,
+      isVerified: false,
+      role: 'user',
+    });
+
+    const code = await this.deps.codeCommands.create({
+      userId: createdUser.id,
+      type: 'verify_email',
+    });
+
+    await this.addAuthJob('verify_email', { email: createdUser.email, code });
+
+    return { status: 'success' };
+  }
+
+  private async addAuthJob<K extends TAuthQueuePayload['name']>(
+    name: K,
+    data: Extract<TAuthQueuePayload, { name: K }>['data'],
+  ) {
+    return await this.deps.authProducer.add(name, data);
+  }
+
   public async login(data: Pick<User, 'email' | 'password'>): Promise<LoginResult> {
     const findUser = await this.deps.userQueries.findByEmail(data.email);
 
-    if (!findUser) return { status: 'error', message: 'Пользователь не найден' };
+    if (!findUser) throw new Error('Пользователь не найден');
 
     const isPasswordValid = await argon2.verify(findUser.password, data.password);
-    if (!isPasswordValid) return { status: 'error', message: 'Неверный пароль' };
+    if (!isPasswordValid) throw new Error('Неверный пароль');
 
     const accessToken = await this.deps.tokenService.sign(findUser, 'access');
     return { status: 'success', accessToken: accessToken.token };

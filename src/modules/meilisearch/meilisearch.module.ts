@@ -1,5 +1,5 @@
 import { Product } from '@/shared/infrastructure/db/schema/product.schema';
-import { createMeilisearchClient } from '@/shared/infrastructure/meilisearch/client';
+import { createMeilisearchClient } from '@/shared/infrastructure/meilisearch/client-factory';
 
 export function createMeilisearchModule() {
   const client = createMeilisearchClient();

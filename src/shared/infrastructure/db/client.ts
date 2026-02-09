@@ -2,7 +2,6 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 
 import { getEnv } from '../../lib/helpers/get-env.helper';
 
-import * as authCodeSchema from './schema/auth-code.schema';
 import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';
 import * as dataCounterSchema from './schema/data-counter.schema';
@@ -20,7 +19,6 @@ export const db = drizzle(getEnv('DATABASE_URL'), {
     ...orderSchema,
     ...refreshTokenSchema,
     ...dataCounterSchema,
-    ...authCodeSchema,
   },
 });
 

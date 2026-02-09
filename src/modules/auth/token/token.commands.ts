@@ -19,6 +19,7 @@ export class TokenCommands {
     return await this.deps.tokenService.verify(token, type);
   }
 
+  // TODO: вынести в кверисы
   public async findValidByUserId(userId: string) {
     return await this.deps.tokenRepo.findValidByUserId(userId);
   }

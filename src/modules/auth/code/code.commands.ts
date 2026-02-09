@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import crypto from 'node:crypto';
 
-import { AuthCode } from '@/shared/infrastructure/db/schema/auth-code.schema';
+import { IAuthCode } from '@/shared/types/auth-code.type';
 
 interface Deps {
   redis: Redis;
@@ -9,7 +9,7 @@ interface Deps {
 
 export class CodeCommands {
   constructor(private readonly deps: Deps) {}
-  public async create(data: Pick<AuthCode, 'userId' | 'type'>) {
+  public async create(data: Pick<IAuthCode, 'userId' | 'type'>) {
     const code = crypto.randomInt(1000, 10000);
     await this.deps.redis.set(`auth:code:${data.type}:${data.userId}`, code, 'EX', 60);
     return code;

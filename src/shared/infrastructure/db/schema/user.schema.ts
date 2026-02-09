@@ -1,7 +1,6 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
 import { boolean, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
-import { authCodeSchema } from './auth-code.schema';
 import { cartSchema } from './cart.schema';
 import { refreshTokenSchema } from './refresh-token.schema';
 import { pgTimestamp } from './timestamp';
@@ -23,7 +22,6 @@ export const userRelation = relations(userSchema, ({ many, one }) => ({
   refreshTokens: many(refreshTokenSchema),
   cart: one(cartSchema),
   orders: many(refreshTokenSchema),
-  codes: many(authCodeSchema),
 }));
 
 export type User = InferSelectModel<typeof userSchema>;
