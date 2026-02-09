@@ -8,7 +8,7 @@ interface Deps {
 }
 
 export interface IDataCounterRepository {
-  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => void;
+  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => Promise<void>;
   getCount: (tableName: string) => Promise<number>;
 }
 
@@ -34,6 +34,6 @@ export class DataCounterRepository implements IDataCounterRepository {
       .where(eq(dataCounterSchema.tableName, tableName))
       .limit(1);
 
-    return result?.[0].totalCount ?? 0;
+    return result?.[0]?.totalCount ?? 0;
   }
 }

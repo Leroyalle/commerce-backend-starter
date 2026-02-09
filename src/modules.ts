@@ -27,6 +27,7 @@ export function createModules() {
   });
   const product = createProductModule({
     dataCounterQueries: dataCounter.queries,
+    dataCounterCommands: dataCounter.commands,
     redis,
     searchIndex: meilisearch.indexes.productIndex,
   });

@@ -7,13 +7,13 @@ interface Deps {
 }
 
 export interface IDataCounterCommands {
-  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => void;
+  updateCount: (type: 'increment' | 'decrement', tableName: string, tx?: DB) => Promise<void>;
 }
 
 export class DataCounterCommands implements IDataCounterCommands {
   constructor(private readonly deps: Deps) {}
 
-  public updateCount(type: 'increment' | 'decrement', tableName: string, tx?: DB) {
-    return this.deps.repository.updateCount(type, tableName, tx);
+  public async updateCount(type: 'increment' | 'decrement', tableName: string, tx?: DB) {
+    return await this.deps.repository.updateCount(type, tableName, tx);
   }
 }

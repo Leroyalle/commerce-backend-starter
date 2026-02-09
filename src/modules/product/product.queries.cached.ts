@@ -7,12 +7,14 @@ import { generateRedisKey } from '@/shared/lib/helpers/generate-redis-key.helper
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 import { IPagination } from '@/shared/types/pagination.type';
 
+import { IDataCounterQueries } from '../data-counter/data-counter.queries';
+
 import { IProductQueries } from './product.queries';
 
 interface Deps {
   redis: Redis;
   productQueries: IProductQueries;
-  getCount: (tableName: string) => Promise<number>;
+  dataCounterQueries: IDataCounterQueries;
   searchIndex: Index<Pick<Product, 'id' | 'name' | 'price'>>;
 }
 
@@ -33,7 +35,7 @@ export class ProductQueriesCached implements IProductQueries {
     const cachedProducts = await this.deps.redis.get(redisKey);
 
     if (cachedProducts) {
-      const count = await this.deps.getCount('products');
+      const count = await this.deps.dataCounterQueries.getCount('products');
       const products: Product[] = JSON.parse(cachedProducts);
       return { total: count, items: products };
     }
