@@ -14,5 +14,6 @@ export default defineConfig({
     user: getEnv('DB_USER'),
     password: getEnv('DB_PASSWORD'),
     database: getEnv('DB_NAME'),
+    ssl: false,
   },
 });
