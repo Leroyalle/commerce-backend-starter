@@ -17,9 +17,11 @@ export class ProductRepo implements IProductRepository {
   }
 
   public async findAll(pagination?: IPagination): Promise<IPaginationResult<Product>> {
+    const page = pagination?.page ?? 1;
+    const limit = pagination?.limit ?? 0;
     const items = await db.query.productSchema.findMany({
-      limit: pagination?.limit,
-      offset: (pagination?.page || 1 - 1) * (pagination?.limit || 0),
+      limit,
+      offset: (page - 1) * limit,
       orderBy: [desc(productSchema.createdAt)],
     });
 
