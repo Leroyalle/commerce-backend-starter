@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
+import { Client } from 'pg';
 
 import { getEnv } from '../../lib/helpers/get-env.helper';
 
@@ -10,16 +11,24 @@ import * as productSchema from './schema/product.schema';
 import * as refreshTokenSchema from './schema/refresh-token.schema';
 import * as userSchema from './schema/user.schema';
 
-export const db = drizzle(getEnv('DATABASE_URL'), {
-  schema: {
-    ...cartSchema,
-    ...cartItemSchema,
-    ...productSchema,
-    ...userSchema,
-    ...orderSchema,
-    ...refreshTokenSchema,
-    ...dataCounterSchema,
-  },
+const client = new Client({
+  host: getEnv('DB_HOST'),
+  port: parseInt(getEnv('DB_PORT')),
+  user: getEnv('DB_USER'),
+  password: getEnv('DB_PASSWORD'),
+  database: getEnv('DB_NAME'),
 });
+
+const schema = {
+  ...cartSchema,
+  ...cartItemSchema,
+  ...productSchema,
+  ...userSchema,
+  ...orderSchema,
+  ...refreshTokenSchema,
+  ...dataCounterSchema,
+};
+
+export const db = drizzle(client, { schema });
 
 export type DB = typeof db;
