@@ -14,15 +14,27 @@ export function accessAuthGuard(
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    const payload = await authCommands.verifyToken(accessToken, 'access');
+    try {
+      const payload = await authCommands.verifyToken(accessToken, 'access');
 
-    if (!payload.payload.sub) {
-      return c.json({ error: 'Unauthorized' }, 401);
+      if (!payload.payload.sub) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      c.set('userId', payload.payload.sub);
+      c.set('role', payload.payload.role);
+
+      await next();
+    } catch (error: any) {
+      if (error?.code === 'ERR_JWT_EXPIRED') {
+        return c.json(
+          {
+            error: 'Token expired',
+            message: 'Пожалуйста, авторизуйтесь заново',
+          },
+          401,
+        );
+      }
     }
-
-    c.set('userId', payload.payload.sub);
-    c.set('role', payload.payload.role);
-
-    await next();
   };
 }

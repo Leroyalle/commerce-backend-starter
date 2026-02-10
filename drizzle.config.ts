@@ -3,7 +3,6 @@ import { defineConfig } from 'drizzle-kit';
 
 import { getEnv } from '@/shared/lib/helpers/get-env.helper';
 
-console.log(getEnv('DATABASE_URL'));
 export default defineConfig({
   out: './drizzle',
   schema: './src/shared/infrastructure/db/schema/*.ts',
