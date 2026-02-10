@@ -8,6 +8,8 @@ import { createCartRouter } from './modules/cart/cart.router';
 import { createOrderRouter } from './modules/order/order.router';
 import { createProductRouter } from './modules/product/product.router';
 import { createUserRouter } from './modules/user/user.router';
+import { ERROR_HTTP_STATUS } from './shared/exceptions/error-status-map';
+import { resolveErrorCode } from './shared/exceptions/resolve-error-code';
 
 const app = new Hono().basePath('/api');
 
@@ -26,16 +28,17 @@ app.use(
 app.onError((err, c) => {
   console.error('ERROR MESSAGE:', err.message);
   console.error('ERROR STACK:', err.stack);
+  if (err.cause) console.error('ERROR CAUSE:', err.cause);
 
-  if (err.cause) {
-    console.error('ERROR CAUSE:', err.cause);
-  }
+  const code = resolveErrorCode(err);
+  const status = ERROR_HTTP_STATUS[code];
 
   return c.json(
     {
       message: err.message,
+      code,
     },
-    500,
+    status,
   );
 });
 
