@@ -10,11 +10,37 @@ export class NotFoundException extends DomainException {
   constructor(entity: string) {
     super(`${entity} не найден`);
   }
+
+  public static User() {
+    return new NotFoundException('Пользователь');
+  }
+  public static Product() {
+    return new NotFoundException('Товар');
+  }
+  public static Order() {
+    return new NotFoundException('Заказ');
+  }
+  public static Code() {
+    return new NotFoundException('Код');
+  }
+  public static Token() {
+    return new NotFoundException('Токен');
+  }
 }
 
 export class AlreadyExistsException extends DomainException {
   constructor(entity: string) {
     super(`${entity} уже существует`);
+  }
+
+  public static User() {
+    return new AlreadyExistsException('Пользователь');
+  }
+  public static Product() {
+    return new AlreadyExistsException('Товар');
+  }
+  public static Order() {
+    return new AlreadyExistsException('Заказ');
   }
 }
 
@@ -25,6 +51,8 @@ export class SamePasswordException extends AuthException {}
 export class TokenExpiredException extends AuthException {}
 export class InvalidTokenException extends AuthException {}
 export class RoleForbiddenException extends AuthException {}
+export class InvalidCodeException extends AuthException {}
+export class UserAlreadyVerifiedException extends AuthException {}
 
 export abstract class ProductException extends DomainException {}
 export class ProductOutOfStockException extends ProductException {}
