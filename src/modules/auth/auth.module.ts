@@ -22,6 +22,7 @@ export function createAuthModule(deps: CreateAuthModuleDeps): CreateModuleResult
 
   const authCommands = new AuthCommands({
     tokenCommands: tokenModule.commands,
+    tokenQueries: tokenModule.queries,
     tokenService: tokenModule.service,
     userCommands: deps.userCommands,
     userQueries: deps.userQueries,

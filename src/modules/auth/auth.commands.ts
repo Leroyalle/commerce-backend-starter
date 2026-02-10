@@ -9,6 +9,7 @@ import { UserQueries } from '../user/user.queries';
 import { CodeCommands } from './code/code.commands';
 import { CodeQueries } from './code/code.queries';
 import { TokenCommands } from './token/token.commands';
+import { ITokenQueries } from './token/token.queries';
 import { TokenService } from './token/token.service';
 
 type RegisterResult = SuccessRegisterResult;
@@ -28,6 +29,7 @@ export interface Deps {
   userCommands: UserCommands;
   tokenService: TokenService;
   tokenCommands: TokenCommands;
+  tokenQueries: ITokenQueries;
   codeCommands: CodeCommands;
   codeQueries: CodeQueries;
   notificationProducer: INotificationProducer;
@@ -160,17 +162,19 @@ export class AuthCommands {
       throw new Error('Пользователь не найден');
     }
 
-    const refreshToken = await this.deps.tokenCommands.findByJti(jti);
+    const refreshToken = await this.deps.tokenQueries.findByJti(jti);
 
     if (!refreshToken) {
       throw new Error('Токен не найден');
     }
+
+    await this.deps.tokenCommands.update(refreshToken.id, { revokedAt: new Date() });
 
     const accessToken = await this.deps.tokenService.sign(user, 'access');
     return { accessToken: accessToken.token };
   }
 
   public async findByJti(jti: string) {
-    return await this.deps.tokenCommands.findByJti(jti);
+    return await this.deps.tokenQueries.findByJti(jti);
   }
 }
