@@ -1,9 +1,11 @@
+import { zValidator } from '@hono/zod-validator';
 import { Hono, MiddlewareHandler } from 'hono';
 
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
 import { OrderCommands } from './order.commands';
 import { OrderQueries } from './order.queries';
+import { createOrderZodSchema } from './schemas/create-order.schema';
 
 interface Deps {
   queries: OrderQueries;
@@ -20,9 +22,9 @@ export function createOrderRouter(deps: Deps): Hono {
     return c.json(result);
   });
 
-  router.post('/', deps.accessAuthMiddleware, async c => {
+  router.post('/', deps.accessAuthMiddleware, zValidator('json', createOrderZodSchema), async c => {
     const userId = c.get('userId');
-    const body = await c.req.json<{ phone: number }>();
+    const body = c.req.valid('json');
     const result = await deps.commands.createOrder(userId, body);
     return c.json(result);
   });

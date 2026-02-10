@@ -1,5 +1,5 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
-import { customType, integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { customType, integer, pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { CartItem, CartItemWithRelations } from './cart-item.schema';
 import { pgTimestamp } from './timestamp';
@@ -20,7 +20,7 @@ export const orderSchema = pgTable('orders', {
     .notNull()
     .references(() => userSchema.id, { onDelete: 'cascade' }),
 
-  phone: integer().notNull(),
+  phone: varchar().notNull(),
   totalAmount: integer().notNull(),
   items: jsonbConfig().$type<Omit<CartItemWithRelations, 'cart' | 'productId'>[]>().notNull(),
   ...pgTimestamp,

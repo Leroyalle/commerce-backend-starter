@@ -20,7 +20,7 @@ export class OrderCommands {
     return this.deps.orderRepo.create(data);
   }
 
-  public async createOrder(userId: string, input: { phone: number }) {
+  public async createOrder(userId: string, input: { phone: string }) {
     const user = await this.deps.userQueries.findById(userId);
 
     if (!user) {
