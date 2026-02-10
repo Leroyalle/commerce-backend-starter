@@ -2,10 +2,7 @@ import Redis from 'ioredis';
 
 import { BrokerQueues } from '@/shared/constants/broker-queues.constants';
 import { createWorker } from '@/shared/infrastructure/broker/worker-factory';
-import {
-  TMailQueuePayload,
-  TNotificationQueuePayload,
-} from '@/shared/types/notification-queue-payload.type';
+import { TMailQueuePayload } from '@/shared/types/notification-queue-payload.type';
 import { ISendEmailPayload } from '@/shared/types/send-email-payload.type';
 
 import { IMailerService } from './mailer.service';
@@ -22,10 +19,7 @@ export function createConsumer(deps: Deps) {
       console.log(`📩 Обработка задачи [${job.name}] для: ${job.data.email}`);
       switch (job.name) {
         case 'verify_email': {
-          const data = job.data as Extract<
-            TNotificationQueuePayload,
-            { name: 'verify_email' }
-          >['data'];
+          const data = job.data as Extract<TMailQueuePayload, { name: 'verify_email' }>['data'];
           const payload: ISendEmailPayload = {
             to: data.email,
             subject: 'Подтверждение почты',
@@ -34,10 +28,7 @@ export function createConsumer(deps: Deps) {
           return await deps.service.send(payload);
         }
         case 'reset_password': {
-          const data = job.data as Extract<
-            TNotificationQueuePayload,
-            { name: 'reset_password' }
-          >['data'];
+          const data = job.data as Extract<TMailQueuePayload, { name: 'reset_password' }>['data'];
           const payload: ISendEmailPayload = {
             to: data.email,
             subject: 'Подтверждение сброса пароля',

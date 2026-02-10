@@ -1,14 +1,6 @@
 import { Order } from '../infrastructure/db/schema/order.schema';
 import { User } from '../infrastructure/db/schema/user.schema';
 
-export type TNotificationQueuePayload =
-  | { name: 'verify_email'; data: { email: string; code: number } }
-  | { name: 'reset_password'; data: { email: string; code: number } }
-  | {
-      name: 'create_order';
-      data: Order;
-    };
-
 export type TMailQueuePayload =
   | { name: 'verify_email'; data: { email: string; code: number } }
   | { name: 'reset_password'; data: { email: string; code: number } }
