@@ -33,7 +33,7 @@ export class CartCommands {
     return cart;
   }
 
-  public async addItem(userId: string, productId: string) {
+  public async addItem(userId: string, productId: string, quantity: number) {
     const cart = await this.findOrCreateCart(userId);
 
     if (!cart) {
@@ -49,7 +49,10 @@ export class CartCommands {
     const findItem = cart.cartItems.find(item => item.productId === productId);
 
     if (findItem) {
-      await this.deps.cartItemCommands.update(findItem.id, { quantity: findItem.quantity + 1 });
+      await this.deps.cartItemCommands.update(findItem.id, {
+        quantity: findItem.quantity + quantity,
+      });
+      return await this.deps.cartRepo.findByUserId(userId);
     }
 
     await this.deps.cartItemCommands.create({

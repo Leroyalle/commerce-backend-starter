@@ -21,6 +21,9 @@ export function createCartRouter(deps: Deps): Hono {
   router.get('/', deps.accessAuthMiddleware, async c => {
     const userId = c.get('userId');
     const data = await deps.queries.findByUserId(userId);
+    if (!data) {
+      return c.json({ error: 'Cart not found' }, 404);
+    }
     return c.json(data);
   });
 
@@ -31,7 +34,7 @@ export function createCartRouter(deps: Deps): Hono {
     async c => {
       const userId = c.get('userId');
       const body = c.req.valid('json');
-      const data = await deps.commands.addItem(userId, body.productId);
+      const data = await deps.commands.addItem(userId, body.productId, body.quantity);
       return c.json(data);
     },
   );
