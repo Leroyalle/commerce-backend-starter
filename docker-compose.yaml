@@ -28,7 +28,7 @@ services:
       - redis_data:/data
 
   postgres:
-    image: postgres:latest
+    image: postgres:16-alpine
     container_name: electronic-db
     ports:
       - '5888:5432'
