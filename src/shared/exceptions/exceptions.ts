@@ -29,6 +29,9 @@ export class NotFoundException extends DomainException {
   public static CartItem() {
     return new NotFoundException('Товар в корзине');
   }
+  public static Cart() {
+    return new NotFoundException('Корзина');
+  }
 }
 
 export class AlreadyExistsException extends DomainException {
