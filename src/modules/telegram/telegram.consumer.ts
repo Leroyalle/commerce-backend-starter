@@ -16,17 +16,15 @@ export function createTelegramConsumer(deps: Deps) {
     BrokerQueues.TELEGRAM,
     async job => {
       try {
-        console.log(`📩 Обработка задачи [${job.name}] для: ${job.data}`);
         switch (job.name) {
           case 'new_order_alert': {
-            console.log(job.data);
             const data = job.data as Extract<TTgQueuePayload, { name: 'new_order_alert' }>['data'];
             await deps.telegramCommands.notifyAdminNewOrder(data.user, data.order);
           }
         }
         return;
       } catch (error) {
-        console.log('ERROR TEELGRAM WORKER', error);
+        console.log('TEELGRAM WORKER ERROR', error);
       }
     },
     deps.redis,

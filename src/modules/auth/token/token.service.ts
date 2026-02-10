@@ -1,6 +1,8 @@
-import { jwtVerify, SignJWT } from 'jose';
+import { decodeJwt, jwtVerify, SignJWT } from 'jose';
 
+import { timeMap } from '@/shared/constants/tokens-time-map.constants';
 import { RoleEnum } from '@/shared/infrastructure/db/schema/user.schema';
+import { SignReturnValue } from '@/shared/types/sign-return-value.type';
 import {
   AccessPayload,
   AuthTokensPayload,
@@ -8,22 +10,6 @@ import {
 } from '@/shared/types/token-payload.type';
 
 import { JwtConfig } from './jwt.config';
-
-const timeMap = {
-  access: '2h',
-  refresh: '30d',
-} as const;
-
-type SignReturnValue<T extends keyof typeof timeMap> = {
-  token: string;
-} & SignReturnMap[T];
-
-type SignReturnMap = {
-  refresh: { jti: string; expAt: Date };
-  access: {
-    expAt: Date;
-  };
-};
 
 export class TokenService {
   constructor(private readonly jwtConfig: JwtConfig) {}
@@ -40,15 +26,6 @@ export class TokenService {
     data: { id: string; role: RoleEnum },
     type: keyof typeof timeMap,
   ): Promise<SignReturnValue<'access'> | SignReturnValue<'refresh'>> {
-    const DAY = 24 * 60 * 60 * 1000;
-
-    const ttl = {
-      refresh: 30 + DAY,
-      access: 2 * 60 * 60 * 1000,
-    };
-
-    const expiresAt = new Date(Date.now() + ttl[type]);
-
     const payload: AuthTokensPayload =
       type === 'access'
         ? { type, sub: data.id, role: data.role }
@@ -61,6 +38,9 @@ export class TokenService {
       .setAudience('myapp')
       .setExpirationTime(timeMap[type])
       .sign(this.jwtConfig[type]);
+
+    const decodedToken = decodeJwt(token);
+    const expiresAt = new Date(decodedToken.exp! * 1000);
 
     if (payload.type === 'access') {
       return {

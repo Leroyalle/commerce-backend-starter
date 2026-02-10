@@ -15,15 +15,19 @@ export class TokenCommands {
     return await this.deps.tokenRepo.create(token);
   }
 
+  public async update(tokenId: string, token: Partial<Omit<RefreshToken, 'id'>>) {
+    return await this.deps.tokenRepo.update(tokenId, token);
+  }
+
   public async verify<T extends 'access' | 'refresh'>(token: string, type: T) {
     return await this.deps.tokenService.verify(token, type);
   }
 
   // TODO: вынести в кверисы
-  public async findValidByUserId(userId: string) {
-    return await this.deps.tokenRepo.findValidByUserId(userId);
-  }
-  public async findByJti(jti: string) {
-    return await this.deps.tokenRepo.findByJti(jti);
-  }
+  // public async findValidByUserId(userId: string) {
+  //   return await this.deps.tokenRepo.findValidByUserId(userId);
+  // }
+  // public async findByJti(jti: string) {
+  //   return await this.deps.tokenRepo.findByJti(jti);
+  // }
 }

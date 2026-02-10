@@ -1,6 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono, MiddlewareHandler } from 'hono';
 
+import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
@@ -18,15 +19,17 @@ type CreateUserRouterDeps = {
 export function createUserRouter(deps: CreateUserRouterDeps): Hono {
   const userRouter = new Hono();
 
-  userRouter.get('/:id', zValidator('param', paramsZodSchema), c => {
-    const params = c.req.valid('param');
-    const data = deps.queries.findById(params.id);
+  userRouter.get('/me', deps.accessAuthMiddleware, async c => {
+    const id = c.get('userId');
+    const data = await deps.queries.findById(id);
+    if (!data) throw NotFoundException.User();
     return c.json(data);
   });
 
-  userRouter.get('/me', deps.accessAuthMiddleware, c => {
-    const id = c.get('userId');
-    const data = deps.queries.findById(id);
+  userRouter.get('/:id', zValidator('param', paramsZodSchema), async c => {
+    const params = c.req.valid('param');
+    const data = await deps.queries.findById(params.id);
+    if (!data) throw NotFoundException.User();
     return c.json(data);
   });
 

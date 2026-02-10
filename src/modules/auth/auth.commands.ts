@@ -1,7 +1,16 @@
 import * as argon2 from 'argon2';
 
+import {
+  AlreadyExistsException,
+  InvalidCodeException,
+  InvalidPasswordException,
+  NotFoundException,
+  SamePasswordException,
+  UserAlreadyVerifiedException,
+} from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { SuccessAuthResult } from '@/shared/types/auth-result.type';
 
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
@@ -9,25 +18,15 @@ import { UserQueries } from '../user/user.queries';
 import { CodeCommands } from './code/code.commands';
 import { CodeQueries } from './code/code.queries';
 import { TokenCommands } from './token/token.commands';
+import { ITokenQueries } from './token/token.queries';
 import { TokenService } from './token/token.service';
-
-type RegisterResult = SuccessRegisterResult;
-type LoginResult = SuccessLoginResult;
-
-type SuccessLoginResult = {
-  status: 'success';
-  accessToken: string;
-};
-
-type SuccessRegisterResult = SuccessLoginResult & {
-  refreshToken: string;
-};
 
 export interface Deps {
   userQueries: UserQueries;
   userCommands: UserCommands;
   tokenService: TokenService;
   tokenCommands: TokenCommands;
+  tokenQueries: ITokenQueries;
   codeCommands: CodeCommands;
   codeQueries: CodeQueries;
   notificationProducer: INotificationProducer;
@@ -38,11 +37,10 @@ export class AuthCommands {
 
   public async resetPassword(userId: string, newPassword: string) {
     const findUser = await this.deps.userQueries.findById(userId);
-    if (!findUser) throw new Error('Пользователь не найден');
-    if (findUser.isVerified) throw new Error('Пользователь уже верифицирован');
+    if (!findUser) throw NotFoundException.User();
     const isSame = await argon2.verify(findUser.password, newPassword);
 
-    if (isSame) throw new Error('Новый пароль не должен совпадать со старым');
+    if (isSame) throw new SamePasswordException('Новый пароль не должен совпадать со старым');
 
     const code = await this.deps.codeCommands.create({
       userId: findUser.id,
@@ -60,37 +58,36 @@ export class AuthCommands {
   public async verifyPasswordCode(userId: string, code: number, newPassword: string) {
     const findUser = await this.deps.userQueries.findById(userId);
 
-    if (!findUser) throw new Error('Пользователь не найден');
-
-    if (findUser.isVerified) throw new Error('Пользователь уже верифицирован');
+    if (!findUser) throw NotFoundException.User();
 
     const findCode = await this.deps.codeQueries.findByUserId({
       userId: findUser.id,
       type: 'reset_password',
     });
 
-    if (!findCode) throw new Error('Код не найден');
-    if (parseInt(findCode) !== code) throw new Error('Неверный код');
+    if (!findCode) throw NotFoundException.Code();
+    if (parseInt(findCode) !== code) throw new InvalidCodeException('Неверный код');
 
     await this.deps.userCommands.update(findUser.id, { password: await argon2.hash(newPassword) });
 
     return { success: true };
   }
 
-  public async verifyEmailCode(email: string, code: number): Promise<RegisterResult> {
+  public async verifyEmailCode(email: string, code: number): Promise<SuccessAuthResult> {
     const findUser = await this.deps.userQueries.findByEmail(email);
 
-    if (!findUser) throw new Error('Пользователь не найден');
+    if (!findUser) throw NotFoundException.User();
 
-    if (findUser.isVerified) throw new Error('Пользователь уже верифицирован');
+    if (findUser.isVerified)
+      throw new UserAlreadyVerifiedException('Пользователь уже верифицирован');
 
     const findCode = await this.deps.codeQueries.findByUserId({
       userId: findUser.id,
       type: 'verify_email',
     });
 
-    if (!findCode) throw new Error('Код не найден');
-    if (parseInt(findCode) !== code) throw new Error('Неверный код');
+    if (!findCode) throw NotFoundException.Code();
+    if (parseInt(findCode) !== code) throw new InvalidCodeException('Неверный код');
 
     await this.deps.userCommands.update(findUser.id, { isVerified: true });
 
@@ -105,7 +102,7 @@ export class AuthCommands {
       revokedAt: null,
     });
 
-    return { status: 'success', accessToken: accessToken.token, refreshToken: refreshToken.token };
+    return { status: 'success', accessToken, refreshToken };
   }
 
   public async register(
@@ -113,7 +110,7 @@ export class AuthCommands {
   ): Promise<{ status: 'success' }> {
     const findUser = await this.deps.userQueries.findByEmail(input.email);
 
-    if (findUser) throw new Error('Пользователь уже зарегистрирован');
+    if (findUser) throw AlreadyExistsException.User();
 
     const hashedPassword = await argon2.hash(input.password);
 
@@ -137,16 +134,25 @@ export class AuthCommands {
     return { status: 'success' };
   }
 
-  public async login(data: Pick<User, 'email' | 'password'>): Promise<LoginResult> {
+  public async login(data: Pick<User, 'email' | 'password'>): Promise<SuccessAuthResult> {
     const findUser = await this.deps.userQueries.findByEmail(data.email);
 
-    if (!findUser) throw new Error('Пользователь не найден');
+    if (!findUser) throw NotFoundException.User();
 
     const isPasswordValid = await argon2.verify(findUser.password, data.password);
-    if (!isPasswordValid) throw new Error('Неверный пароль');
+    if (!isPasswordValid) throw new InvalidPasswordException('Неверный пароль');
 
+    const refreshToken = await this.deps.tokenService.sign(findUser, 'refresh');
     const accessToken = await this.deps.tokenService.sign(findUser, 'access');
-    return { status: 'success', accessToken: accessToken.token };
+
+    await this.deps.tokenCommands.create({
+      token: refreshToken.token,
+      userId: findUser.id,
+      jti: refreshToken.jti,
+      expAt: refreshToken.expAt,
+      revokedAt: null,
+    });
+    return { status: 'success', accessToken, refreshToken };
   }
 
   public async verifyToken<T extends 'access' | 'refresh'>(token: string, type: T) {
@@ -156,21 +162,28 @@ export class AuthCommands {
   public async refresh(userId: string, jti: string) {
     const user = await this.deps.userQueries.findById(userId);
 
-    if (!user) {
-      throw new Error('Пользователь не найден');
-    }
+    if (!user) throw NotFoundException.User();
 
-    const refreshToken = await this.deps.tokenCommands.findByJti(jti);
+    const findRefresh = await this.deps.tokenQueries.findByJti(jti);
 
-    if (!refreshToken) {
-      throw new Error('Токен не найден');
-    }
+    if (!findRefresh) throw NotFoundException.Token();
 
+    await this.deps.tokenCommands.update(findRefresh.id, { revokedAt: new Date() });
+
+    const refreshToken = await this.deps.tokenService.sign(user, 'refresh');
     const accessToken = await this.deps.tokenService.sign(user, 'access');
-    return { accessToken: accessToken.token };
+
+    await this.deps.tokenCommands.create({
+      token: refreshToken.token,
+      userId: user.id,
+      jti: refreshToken.jti,
+      expAt: refreshToken.expAt,
+      revokedAt: null,
+    });
+    return { accessToken, refreshToken };
   }
 
   public async findByJti(jti: string) {
-    return await this.deps.tokenCommands.findByJti(jti);
+    return await this.deps.tokenQueries.findByJti(jti);
   }
 }

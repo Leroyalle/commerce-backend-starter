@@ -27,4 +27,12 @@ export class TokenRepo implements ITokenRepository {
       where: eq(refreshTokenSchema.jti, jti),
     });
   }
+
+  public async update(tokenId: string, token: Partial<Omit<RefreshToken, 'id'>>) {
+    return await db
+      .update(refreshTokenSchema)
+      .set(token)
+      .where(eq(refreshTokenSchema.id, tokenId))
+      .returning();
+  }
 }

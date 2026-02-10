@@ -11,7 +11,6 @@ interface Deps {
 }
 
 export function createTelegramModule(deps: Deps): CreateModuleResult<TelegramCommands> {
-  console.log(process.env.BOT_API_KEY);
   const bot = createTelegramBot();
 
   const commands = new TelegramCommands(bot);

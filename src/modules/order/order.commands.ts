@@ -1,3 +1,4 @@
+import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { Order } from '@/shared/infrastructure/db/schema/order.schema';
 
@@ -24,15 +25,11 @@ export class OrderCommands {
   public async createOrder(userId: string, input: { phone: string }) {
     const user = await this.deps.userQueries.findById(userId);
 
-    if (!user) {
-      throw new Error('Пользователь не найден');
-    }
+    if (!user) throw NotFoundException.User();
 
     const cart = await this.deps.cartQueries.findByUserId(userId);
 
-    if (!cart) {
-      throw new Error('Корзина не найдена');
-    }
+    if (!cart) throw NotFoundException.Cart();
 
     const amount = cart.cartItems.reduce(
       (acc, item) => acc + item.product.price * item.quantity,
