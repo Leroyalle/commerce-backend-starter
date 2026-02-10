@@ -7,7 +7,7 @@ interface Deps {
 }
 
 export function createMiddlewares(deps: Deps) {
-  const accessTokenGuard = accessAuthGuard(deps.authCommands.verifyToken);
+  const accessTokenGuard = accessAuthGuard(deps.authCommands);
   const refreshTokenGuard = refreshGuard(deps.authCommands);
 
   return {

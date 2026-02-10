@@ -1,18 +1,11 @@
 import { MiddlewareHandler } from 'hono';
 import { getCookie } from 'hono/cookie';
-import { JWTHeaderParameters, JWTPayload } from 'jose';
 
+import { AuthCommands } from '@/modules/auth/auth.commands';
 import { AuthVars } from '@/shared/types/auth-variables.type';
-import { AccessPayload, RefreshPayload } from '@/shared/types/token-payload.type';
 
 export function accessAuthGuard(
-  verifyToken: <T extends 'access' | 'refresh'>(
-    token: string,
-    type: T,
-  ) => Promise<{
-    payload: JWTPayload & (T extends 'access' ? AccessPayload : RefreshPayload);
-    protectedHeader: JWTHeaderParameters;
-  }>,
+  authCommands: AuthCommands,
 ): MiddlewareHandler<{ Variables: AuthVars }> {
   return async (c, next): Promise<Response | void> => {
     const accessToken = getCookie(c, 'accessToken');
@@ -21,7 +14,7 @@ export function accessAuthGuard(
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    const payload = await verifyToken(accessToken, 'access');
+    const payload = await authCommands.verifyToken(accessToken, 'access');
 
     if (!payload.payload.sub) {
       return c.json({ error: 'Unauthorized' }, 401);
