@@ -2,7 +2,7 @@ import * as argon2 from 'argon2';
 
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { User } from '@/shared/infrastructure/db/schema/user.schema';
-import { SignReturnValue } from '@/shared/types/sign-return-value.type';
+import { SuccessAuthResult } from '@/shared/types/auth-result.type';
 
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
@@ -12,22 +12,6 @@ import { CodeQueries } from './code/code.queries';
 import { TokenCommands } from './token/token.commands';
 import { ITokenQueries } from './token/token.queries';
 import { TokenService } from './token/token.service';
-
-type RegisterResult = SuccessRegisterResult;
-type LoginResult = SuccessLoginResult;
-
-type AuthTokens = {
-  accessToken: SignReturnValue<'access'>;
-  refreshToken: SignReturnValue<'refresh'>;
-};
-
-type SuccessLoginResult = {
-  status: 'success';
-  // accessToken: string;
-  // refreshToken: string;
-} & AuthTokens;
-
-type SuccessRegisterResult = SuccessLoginResult;
 
 export interface Deps {
   userQueries: UserQueries;
@@ -84,7 +68,7 @@ export class AuthCommands {
     return { success: true };
   }
 
-  public async verifyEmailCode(email: string, code: number): Promise<RegisterResult> {
+  public async verifyEmailCode(email: string, code: number): Promise<SuccessAuthResult> {
     const findUser = await this.deps.userQueries.findByEmail(email);
 
     if (!findUser) throw new Error('Пользователь не найден');
@@ -144,16 +128,13 @@ export class AuthCommands {
     return { status: 'success' };
   }
 
-  public async login(data: Pick<User, 'email' | 'password'>): Promise<LoginResult> {
+  public async login(data: Pick<User, 'email' | 'password'>): Promise<SuccessAuthResult> {
     const findUser = await this.deps.userQueries.findByEmail(data.email);
 
     if (!findUser) throw new Error('Пользователь не найден');
 
     const isPasswordValid = await argon2.verify(findUser.password, data.password);
     if (!isPasswordValid) throw new Error('Неверный пароль');
-
-    // const oldRefresh = await this.deps.tokenQueries.findValidByUserId(findUser.id);
-    // if (oldRefresh) await this.deps.tokenCommands.update(oldRefresh.id, { revokedAt: new Date() });
 
     const refreshToken = await this.deps.tokenService.sign(findUser, 'refresh');
     const accessToken = await this.deps.tokenService.sign(findUser, 'access');
