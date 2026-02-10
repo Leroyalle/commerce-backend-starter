@@ -27,7 +27,7 @@ export class CartCommands {
 
     if (!cart) {
       const createdCart = await this.create(userId);
-      cart = await this.deps.cartRepo.findByUserId(createdCart.id);
+      cart = await this.deps.cartRepo.findByUserId(createdCart.userId);
     }
 
     return cart;
