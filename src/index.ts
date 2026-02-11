@@ -42,7 +42,7 @@ app.onError((err, c) => {
   );
 });
 
-const { auth, cart, order, product, user, meilisearch } = createModules();
+const { auth, cart, order, product, user, meilisearch } = await createModules();
 const { accessGuard, refreshGuard } = createMiddlewares({ authCommands: auth.commands });
 
 const userRouter = createUserRouter({

@@ -1,15 +1,15 @@
 services:
-  backend:
-    build: .
-    ports:
-      - '3000:3000'
-    env_file:
-      - .env
-    container_name: electronic_api
-    depends_on:
-      - postgres
-      - redis
-      - meilisearch
+  # backend:
+  #   build: .
+  #   ports:
+  #     - '3000:3000'
+  #   env_file:
+  #     - .env
+  #   container_name: electronic_api
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #     - meilisearch
 
   meilisearch:
     image: getmeili/meilisearch:latest
