@@ -11,11 +11,12 @@ import { NotificationProducer } from './shared/infrastructure/broker/producers/n
 import { db } from './shared/infrastructure/db/client';
 import { redis } from './shared/infrastructure/redis/client';
 
-export function createModules() {
+export async function createModules() {
+  const meilisearch = await createMeilisearchModule();
+
   const notificationProducer = new NotificationProducer(redis);
 
   const mailer = createMailerModule({ redis });
-  const meilisearch = createMeilisearchModule();
 
   const telegram = createTelegramModule({ redis });
 

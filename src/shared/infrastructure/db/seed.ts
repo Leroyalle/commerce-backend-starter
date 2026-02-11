@@ -1,9 +1,11 @@
+import { faker } from '@faker-js/faker/locale/ru';
+
 import { createModules } from '@/modules';
 
 import { db } from './client';
 import { productSchema } from './schema/product.schema';
 
-const { product, meilisearch } = createModules();
+const { product, meilisearch } = await createModules();
 
 async function clear() {
   console.log('Clearing...');
@@ -15,9 +17,12 @@ async function seed() {
   console.log('Seeding data...');
 
   for (let i = 0; i < 10; i++) {
+    const name = faker.commerce.productName();
+    const aliases = [name, name.toLowerCase(), name.replace(/\s+/g, '')];
     await product.commands.create({
-      name: `Product ${i}`,
-      price: Math.floor(Math.random() * 100),
+      name,
+      price: faker.number.int({ min: 1, max: 100_000 }),
+      aliases,
     });
   }
 }

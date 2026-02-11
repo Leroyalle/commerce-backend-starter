@@ -8,6 +8,7 @@ export const productSchema = pgTable('products', {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
   price: integer().notNull(),
+  aliases: text().array().$type<string[]>().default([]),
   ...pgTimestamp,
 });
 

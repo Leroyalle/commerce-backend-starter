@@ -8,6 +8,7 @@
     "seed": "bun run src/shared/infrastructure/db/seed.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@hono/zod-validator": "^0.7.6",
     "@saintleroyalle/core": "^1.0.2",
     "argon2": "^0.44.0",
