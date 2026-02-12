@@ -1,13 +1,13 @@
 import { OauthAccount } from '@/shared/infrastructure/db/schema/oauth-account.schema';
 
-import { IOAuthRepository } from './oauth.repo';
+import { IOauthRepository } from './oauth.repo';
 
 export interface IOauthQueries {
   findById(id: string): Promise<OauthAccount | undefined>;
 }
 
 interface Deps {
-  repository: IOAuthRepository;
+  repository: IOauthRepository;
 }
 
 export class OauthQueries implements IOauthQueries {

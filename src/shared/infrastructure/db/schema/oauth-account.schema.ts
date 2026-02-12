@@ -3,6 +3,7 @@ import { pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { ProviderName, providersMap } from '@/modules/auth/constants/providers-map.constant';
 
+import { pgTimestamp } from './timestamp';
 import { userSchema } from './user.schema';
 
 const providersArray = Object.keys(providersMap) as [ProviderName, ...ProviderName[]];
@@ -16,6 +17,7 @@ export const oauthAccountSchema = pgTable('oauthAccounts', {
   userId: uuid()
     .notNull()
     .references(() => userSchema.id, { onDelete: 'cascade' }),
+  ...pgTimestamp,
 });
 
 export const oauthAccountRelations = relations(oauthAccountSchema, ({ one }) => ({
