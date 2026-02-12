@@ -3,10 +3,10 @@ import { Pool } from 'pg';
 
 import { getEnv } from '../../lib/helpers/get-env.helper';
 
+import * as accountSchema from './schema/account.schema';
 import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';
 import * as dataCounterSchema from './schema/data-counter.schema';
-import * as oauthAccountSchema from './schema/oauth-account.schema';
 import * as orderSchema from './schema/order.schema';
 import * as productSchema from './schema/product.schema';
 import * as refreshTokenSchema from './schema/refresh-token.schema';
@@ -29,7 +29,7 @@ const schema = {
   ...orderSchema,
   ...refreshTokenSchema,
   ...dataCounterSchema,
-  ...oauthAccountSchema,
+  ...accountSchema,
 };
 
 export const db = drizzle(client, {

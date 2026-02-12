@@ -13,7 +13,7 @@ export const providersMap = {
     getEnv('YANDEX_CLIENT_SECRET'),
     'http://localhost:3000/auth/:provider/callback',
   ),
-};
+} as const;
 
 export type ProviderName = keyof typeof providersMap;
 export type ProviderType = (typeof providersMap)[keyof typeof providersMap];
