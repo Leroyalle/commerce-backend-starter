@@ -8,7 +8,7 @@ import { AuthVars } from '@/shared/types/auth-variables.type';
 export function optionalAccessAuthGuard(
   authCommands: AuthCommands,
   userQueries: UserQueries,
-): MiddlewareHandler<{ Variables: AuthVars }> {
+): MiddlewareHandler<{ Variables: Partial<AuthVars> }> {
   return async (c, next): Promise<Response | void> => {
     const accessToken = getCookie(c, 'accessToken');
 
@@ -29,7 +29,7 @@ export function optionalAccessAuthGuard(
       }
 
       const user = await userQueries.findById(account.userId);
-      if (!user) {
+      if (!user || !user.emailVerifiedAt) {
         return await next();
       }
 

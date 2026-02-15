@@ -31,7 +31,7 @@ export function accessAuthGuard(
 
       const user = await userQueries.findById(account.userId);
 
-      if (!user) {
+      if (!user || !user.emailVerifiedAt) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
 

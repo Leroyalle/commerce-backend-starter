@@ -1,5 +1,5 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
-import { boolean, index, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { ProviderName, providersMap } from '@/modules/auth/constants/providers-map.constant';
 
@@ -36,7 +36,6 @@ export const credentialsAccountSchema = pgTable('credentialsAccounts', {
     .primaryKey()
     .references(() => accountSchema.id, { onDelete: 'cascade' }),
   password: text().notNull(),
-  isVerified: boolean().notNull().default(false),
   ...pgTimestamp,
 });
 

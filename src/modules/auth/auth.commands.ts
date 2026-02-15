@@ -101,7 +101,6 @@ export class AuthCommands {
           provider: 'credentials',
         },
         providerDetails: {
-          isVerified: true,
           type: 'credentials',
           password: hashedPassword,
         },
@@ -110,7 +109,6 @@ export class AuthCommands {
       await this.deps.accountCommands.update(account.id, {
         providerDetails: {
           type: 'credentials',
-          isVerified: true,
           password: hashedPassword,
         },
       });
@@ -126,11 +124,10 @@ export class AuthCommands {
 
     if (!findUser) throw NotFoundException.User();
     const account = findUser.accounts.find(acc => acc.credentialsAccount);
-    const credentialsAccount = account?.credentialsAccount;
 
     if (!account) throw NotFoundException.Account();
 
-    if (credentialsAccount?.isVerified)
+    if (findUser.emailVerifiedAt)
       throw new UserAlreadyVerifiedException('Пользователь уже верифицирован');
 
     const findCode = await this.deps.codeQueries.findByUserId({
@@ -141,12 +138,7 @@ export class AuthCommands {
     if (!findCode) throw NotFoundException.Code();
     if (parseInt(findCode) !== code) throw new InvalidCodeException('Неверный код');
 
-    await this.deps.accountCommands.update(account.id, {
-      providerDetails: {
-        isVerified: true,
-        type: 'credentials',
-      },
-    });
+    await this.deps.userCommands.update(findUser.id, { emailVerifiedAt: new Date() });
 
     const accessToken = await this.deps.tokenService.sign(
       {
@@ -181,7 +173,11 @@ export class AuthCommands {
 
     const hashedPassword = await argon2.hash(input.password);
 
-    const createdUser = await this.deps.userCommands.create(input);
+    const createdUser = await this.deps.userCommands.create({
+      email: input.email,
+      emailVerifiedAt: null,
+      name: input.name,
+    });
 
     const account = await this.deps.accountCommands.create({
       account: {
@@ -191,7 +187,6 @@ export class AuthCommands {
         userId: createdUser.id,
       },
       providerDetails: {
-        isVerified: false,
         type: 'credentials',
         password: hashedPassword,
       },
@@ -218,10 +213,9 @@ export class AuthCommands {
     const account = findUser.accounts.find(acc => acc.credentialsAccount);
     const credentialsAccount = account?.credentialsAccount;
 
-    if (!account) throw NotFoundException.Account();
+    if (!account || !credentialsAccount) throw NotFoundException.Account();
 
-    if (!credentialsAccount?.isVerified)
-      throw new UserNotVerifiedException('Аккаунт не верефецирован');
+    if (!findUser.emailVerifiedAt) throw new UserNotVerifiedException('Аккаунт не верефецирован');
 
     const isPasswordValid = await argon2.verify(credentialsAccount.password, data.password);
     if (!isPasswordValid) throw new InvalidPasswordException('Неверный пароль');
@@ -285,6 +279,7 @@ export class AuthCommands {
   }
 
   public async oauthLoginCallback(
+    user: User | undefined,
     providerName: ProviderName,
     data: { code: string; state: string; storedState: string },
   ) {
@@ -312,7 +307,7 @@ export class AuthCommands {
     let account: Account | undefined = undefined;
 
     if (isGithubResponse(response)) {
-      account = await this.findAndUpdateAccount({
+      account = await this.findAndUpdateAccount(user, {
         displayName: response.displayName,
         email: response.email,
         providerId: response.externalId,
@@ -321,7 +316,7 @@ export class AuthCommands {
     }
 
     if (isYandexResponse(response)) {
-      account = await this.findAndUpdateAccount({
+      account = await this.findAndUpdateAccount(user, {
         displayName: response.first_name,
         email: response.default_email,
         providerId: response.id,
@@ -337,43 +332,78 @@ export class AuthCommands {
     return { status: 'success', accessToken, refreshToken };
   }
 
-  private async findAndUpdateAccount(response: {
-    providerId: string;
-    displayName: string;
-    email: string;
-    providerName: ProviderName;
-  }): Promise<Account | undefined> {
-    const oauthAccount = await this.deps.accountQueries.findByProviderId(response.providerId);
+  private async findAndUpdateAccount(
+    user: User | undefined,
+    data: {
+      providerId: string;
+      displayName: string;
+      email: string;
+      providerName: ProviderName;
+    },
+  ): Promise<Account | undefined> {
+    const oauthAccount = await this.deps.accountQueries.findByProviderAccount(
+      data.providerName,
+      data.providerId,
+    );
+
+    // TODO: сделать транзакцией
     if (oauthAccount) {
-      await this.deps.userCommands.update(oauthAccount.userId, {
-        name: response.displayName,
-      });
+      // await this.deps.userCommands.update(oauthAccount.userId, {
+      //   name: data.displayName,
+      // });
 
       return oauthAccount;
     }
-    if (!oauthAccount) {
-      const findUser = await this.deps.userCommands.create({
-        email: response.email,
-        name: response.displayName,
-      });
 
-      console.log('after user create');
-      const acc = await this.deps.accountCommands.create({
+    if (user) {
+      return await this.deps.accountCommands.create({
         providerDetails: {
-          providerAccountId: response.providerId,
+          providerAccountId: data.providerId,
           type: 'oauth',
         },
         account: {
           type: 'oauth',
-          userId: findUser.id,
-          provider: response.providerName,
+          userId: user.id,
+          provider: data.providerName,
           role: 'user',
         },
       });
-
-      console.log('after account create', acc);
-      return acc;
     }
+
+    const existingUser = await this.deps.userQueries.findByEmail(data.email);
+
+    if (existingUser?.emailVerifiedAt) throw AlreadyExistsException.User();
+
+    const createdUser = await this.deps.userCommands.create({
+      email: data.email,
+      name: data.displayName,
+      emailVerifiedAt: null,
+    });
+
+    const createdAccount = await this.deps.accountCommands.create({
+      providerDetails: {
+        providerAccountId: data.providerId,
+        type: 'oauth',
+      },
+      account: {
+        type: 'oauth',
+        userId: createdUser.id,
+        provider: data.providerName,
+        role: 'user',
+      },
+    });
+
+    const code = await this.deps.codeCommands.create({
+      accountId: createdAccount.id,
+      type: 'verify_email',
+    });
+
+    await this.deps.notificationProducer.sendEmail('verify_email', {
+      email: createdUser.email,
+      code,
+    });
+
+    return createdAccount;
   }
 
   public async getUserOauthData<T extends keyof TProvidersInfoMapConstant>(data: {

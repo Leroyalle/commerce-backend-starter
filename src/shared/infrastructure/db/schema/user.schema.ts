@@ -1,5 +1,5 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
-import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { accountSchema } from './account.schema';
 import { cartSchema } from './cart.schema';
@@ -9,7 +9,8 @@ import { pgTimestamp } from './timestamp';
 export const userSchema = pgTable('users', {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
-  email: text().notNull().unique(),
+  email: text().notNull(),
+  emailVerifiedAt: timestamp({ withTimezone: false }),
   ...pgTimestamp,
 });
 

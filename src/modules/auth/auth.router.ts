@@ -21,6 +21,7 @@ interface Deps {
     Variables: RefreshAuthVars;
   }>;
   accessGuard: MiddlewareHandler<{ Variables: AuthVars }>;
+  optionalAccessGuard: MiddlewareHandler<{ Variables: Partial<AuthVars> }>;
 }
 export function createAuthRouter(deps: Deps): Hono {
   const authRouter = new Hono();
@@ -60,28 +61,35 @@ export function createAuthRouter(deps: Deps): Hono {
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
 
-  authRouter.get('/login/:provider', zValidator('param', oauthProviderZodSchema), c => {
-    const params = c.req.valid('param');
-    const result = deps.commands.oauthLogin(params.provider);
-    setCookie(c, 'oauth_state', result.state, {
-      path: '/',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 10,
-      sameSite: 'Lax',
-    });
-    return c.redirect(result.url);
-  });
+  authRouter.get(
+    '/login/:provider',
+    deps.optionalAccessGuard,
+    zValidator('param', oauthProviderZodSchema),
+    c => {
+      const params = c.req.valid('param');
+      const result = deps.commands.oauthLogin(params.provider);
+      setCookie(c, 'oauth_state', result.state, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 10,
+        sameSite: 'Lax',
+      });
+      return c.redirect(result.url);
+    },
+  );
 
   authRouter.get(
     '/login/:provider/callback',
+    deps.optionalAccessGuard,
     zValidator('param', oauthProviderZodSchema),
     zValidator('query', oauthCallbackZodSchema),
     async c => {
       const params = c.req.valid('param');
       const queryParams = c.req.valid('query');
+      const user = c.get('user');
       const storedState = getCookie(c, 'oauth_state') ?? '';
-      const result = await deps.commands.oauthLoginCallback(params.provider, {
+      const result = await deps.commands.oauthLoginCallback(user, params.provider, {
         ...queryParams,
         storedState,
       });
