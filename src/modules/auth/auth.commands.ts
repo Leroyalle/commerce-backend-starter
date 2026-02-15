@@ -248,7 +248,6 @@ export class AuthCommands {
   }
 
   public async refresh(accountId: string, jti: string) {
-    console.log('accountId', accountId);
     const account = await this.deps.accountQueries.findById(accountId);
 
     if (!account || !account.userId) throw NotFoundException.Account();
@@ -357,7 +356,9 @@ export class AuthCommands {
         email: response.email,
         name: response.displayName,
       });
-      return await this.deps.accountCommands.create({
+
+      console.log('after user create');
+      const acc = await this.deps.accountCommands.create({
         providerDetails: {
           providerAccountId: response.providerId,
           type: 'oauth',
@@ -369,6 +370,9 @@ export class AuthCommands {
           role: 'user',
         },
       });
+
+      console.log('after account create', acc);
+      return acc;
     }
   }
 

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
 import {
@@ -32,7 +32,18 @@ export class AccountRepo implements IAccountRepository {
 
   public async findByProviderId(providerId: string) {
     return await db.query.accountSchema.findFirst({
-      where: eq(oauthAccountSchema.providerAccountId, providerId),
+      where: (account, { exists }) =>
+        exists(
+          db
+            .select()
+            .from(oauthAccountSchema)
+            .where(
+              and(
+                eq(oauthAccountSchema.accountId, account.id),
+                eq(oauthAccountSchema.providerAccountId, providerId),
+              ),
+            ),
+        ),
       with: {
         oauthAccount: true,
       },
@@ -77,7 +88,7 @@ export class AccountRepo implements IAccountRepository {
   ): Promise<Account> {
     return db.transaction(async tx => {
       const [account] = await tx.insert(accountSchema).values(data.account).returning();
-
+      console.log('data after insert account', data);
       if (data.providerDetails.type === 'oauth') {
         await tx
           .insert(oauthAccountSchema)

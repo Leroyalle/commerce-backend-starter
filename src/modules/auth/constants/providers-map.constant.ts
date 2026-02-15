@@ -6,12 +6,12 @@ export const providersMap = {
   GitHub: new GitHub(
     getEnv('GITHUB_CLIENT_ID'),
     getEnv('GITHUB_CLIENT_SECRET'),
-    'http://localhost:3000/auth/:provider/callback',
+    'http://localhost:3000/api/auth/login/GitHub/callback',
   ),
   Yandex: new Yandex(
     getEnv('YANDEX_CLIENT_ID'),
     getEnv('YANDEX_CLIENT_SECRET'),
-    'http://localhost:3000/auth/:provider/callback',
+    'http://localhost:3000/api/auth/login/Yandex/callback',
   ),
 } as const;
 

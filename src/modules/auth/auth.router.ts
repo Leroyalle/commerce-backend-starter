@@ -73,7 +73,7 @@ export function createAuthRouter(deps: Deps): Hono {
     return c.redirect(result.url);
   });
 
-  authRouter.post(
+  authRouter.get(
     '/login/:provider/callback',
     zValidator('param', oauthProviderZodSchema),
     zValidator('query', oauthCallbackZodSchema),
@@ -94,7 +94,7 @@ export function createAuthRouter(deps: Deps): Hono {
         expires: result.refreshToken.expAt,
       });
 
-      c.json({ accessToken: result.accessToken }, 201);
+      return c.json({ accessToken: result.accessToken }, 201);
     },
   );
 
