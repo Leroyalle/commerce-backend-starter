@@ -1,5 +1,5 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
-import { boolean, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { boolean, index, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { ProviderName, providersMap } from '@/modules/auth/constants/providers-map.constant';
 
@@ -14,13 +14,22 @@ const providersArray = Object.keys(providersMap) as [ProviderName, ...ProviderNa
 export const providers = pgEnum('provider', [...providersArray, 'credentials']);
 export const type = pgEnum('type', ['oauth', 'credentials']);
 
-export const oauthAccountSchema = pgTable('oauthAccounts', {
-  accountId: uuid()
-    .primaryKey()
-    .references(() => accountSchema.id, { onDelete: 'cascade' }),
-  providerAccountId: text().notNull(),
-  ...pgTimestamp,
-});
+export const oauthAccountSchema = pgTable(
+  'oauthAccounts',
+  {
+    accountId: uuid()
+      .primaryKey()
+      .references(() => accountSchema.id, { onDelete: 'cascade' }),
+    providerAccountId: text().notNull(),
+    ...pgTimestamp,
+  },
+  table => ({
+    providerAccountIdx: index('oauth_provider_account_idx').on(
+      table.providerAccountId,
+      table.accountId,
+    ),
+  }),
+);
 
 export const credentialsAccountSchema = pgTable('credentialsAccounts', {
   accountId: uuid()
@@ -31,16 +40,22 @@ export const credentialsAccountSchema = pgTable('credentialsAccounts', {
   ...pgTimestamp,
 });
 
-export const accountSchema = pgTable('accounts', {
-  id: uuid().defaultRandom().primaryKey(),
-  provider: providers().notNull(),
-  type: type().notNull(),
-  role: roleEnum().notNull(),
-  userId: uuid()
-    .notNull()
-    .references(() => userSchema.id, { onDelete: 'cascade' }),
-  ...pgTimestamp,
-});
+export const accountSchema = pgTable(
+  'accounts',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    provider: providers().notNull(),
+    type: type().notNull(),
+    role: roleEnum().notNull(),
+    userId: uuid()
+      .notNull()
+      .references(() => userSchema.id, { onDelete: 'cascade' }),
+    ...pgTimestamp,
+  },
+  table => ({
+    userIdIdx: index('accounts_user_id_idx').on(table.userId),
+  }),
+);
 
 export const accountRelations = relations(accountSchema, ({ one, many }) => ({
   user: one(userSchema, {
