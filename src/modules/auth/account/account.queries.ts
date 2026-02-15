@@ -1,9 +1,12 @@
 import { AccountWithRelations } from '@/shared/infrastructure/db/schema/account.schema';
 
+import { ProviderName } from '../constants/providers-map.constant';
+
 import { IAccountRepository } from './account.repo';
 
 export interface IAccountQueries {
-  findByProviderId(
+  findByProviderAccount(
+    providerName: ProviderName,
     id: string,
   ): Promise<Omit<AccountWithRelations, 'credentialsAccount'> | undefined>;
   findById(id: string): Promise<AccountWithRelations | undefined>;
@@ -20,9 +23,10 @@ export class AccountQueries implements IAccountQueries {
     return this.deps.repository.findById(id);
   }
 
-  public findByProviderId(
+  public findByProviderAccount(
+    providerName: ProviderName,
     id: string,
   ): Promise<Omit<AccountWithRelations, 'credentialsAccount'> | undefined> {
-    return this.deps.repository.findByProviderId(id);
+    return this.deps.repository.findByProviderAccount(providerName, id);
   }
 }

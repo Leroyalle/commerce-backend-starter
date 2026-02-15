@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
 import {
@@ -10,10 +10,13 @@ import {
 } from '@/shared/infrastructure/db/schema/account.schema';
 import { ICreateAccount, IUpdateAccount } from '@/shared/types/auth/create-account.type';
 
+import { ProviderName } from '../constants/providers-map.constant';
+
 export interface IAccountRepository {
   findById(id: string): Promise<AccountWithRelations | undefined>;
-  findByProviderId(
-    id: string,
+  findByProviderAccount(
+    provider: ProviderName,
+    providerId: string,
   ): Promise<Omit<AccountWithRelations, 'credentialsAccount'> | undefined>;
   create(data: Omit<ICreateAccount, 'id' | 'createdAt' | 'updatedAt'>): Promise<Account>;
   update(id: string, data: IUpdateAccount): Promise<Account | undefined>;
@@ -30,19 +33,22 @@ export class AccountRepo implements IAccountRepository {
     });
   }
 
-  public async findByProviderId(providerId: string) {
+  public async findByProviderAccount(provider: ProviderName, providerId: string) {
     return await db.query.accountSchema.findFirst({
-      where: (account, { exists }) =>
-        exists(
-          db
-            .select()
-            .from(oauthAccountSchema)
-            .where(
-              and(
-                eq(oauthAccountSchema.accountId, account.id),
-                eq(oauthAccountSchema.providerAccountId, providerId),
+      where: (account, { and, eq, exists }) =>
+        and(
+          eq(account.provider, provider),
+          exists(
+            db
+              .select()
+              .from(oauthAccountSchema)
+              .where(
+                and(
+                  eq(oauthAccountSchema.accountId, account.id),
+                  eq(oauthAccountSchema.providerAccountId, providerId),
+                ),
               ),
-            ),
+          ),
         ),
       with: {
         oauthAccount: true,
@@ -66,7 +72,7 @@ export class AccountRepo implements IAccountRepository {
           .update(credentialsAccountSchema)
           .set({
             password: data.providerDetails.password,
-            isVerified: data.providerDetails.isVerified,
+            // isVerified: data.providerDetails.isVerified,
           })
           .where(eq(credentialsAccountSchema.accountId, id));
       }
