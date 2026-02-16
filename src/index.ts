@@ -43,6 +43,7 @@ app.onError((err, c) => {
 });
 
 const { auth, cart, order, product, user, meilisearch } = await createModules();
+
 const { accessGuard, refreshGuard, optionalAccessGuard } = createMiddlewares({
   authCommands: auth.commands,
   authQueries: auth.queries,
