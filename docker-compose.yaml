@@ -5,7 +5,6 @@ services:
   #     - '3000:3000'
   #   env_file:
   #     - .env
-
   #   container_name: backend-starter
   #   depends_on:
   #     - postgres
