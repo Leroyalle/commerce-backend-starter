@@ -1,5 +1,6 @@
 import { createAuthModule } from './modules/auth/auth.module';
 import { createCartModule } from './modules/cart/cart.module';
+import { createCategoryModule } from './modules/category/category.module';
 import { createDataCounterModule } from './modules/data-counter/data-counter.module';
 import { createMailerModule } from './modules/mailer/mailer.module';
 import { createMeilisearchModule } from './modules/meilisearch/meilisearch.module';
@@ -24,6 +25,7 @@ export async function createModules() {
 
   const user = createUserModule();
 
+  const category = createCategoryModule({ db });
   const auth = createAuthModule({
     userCommands: user.commands,
     userQueries: user.queries,
@@ -50,6 +52,7 @@ export async function createModules() {
     user,
     auth,
     product,
+    category,
     cart,
     order,
     telegram,
