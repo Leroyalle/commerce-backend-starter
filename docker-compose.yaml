@@ -13,7 +13,7 @@ services:
   #     - meilisearch
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.35.0
     container_name: electronic-meilisearch
     ports:
       - 7700:7700
@@ -23,7 +23,7 @@ services:
       - meili_data:/meili_data
 
   redis:
-    image: 'redis:latest'
+    image: 'redis:7.4-alpine'
     container_name: 'electronic-redis'
     command:
       ['redis-server', '--user', '${REDIS_USER}', 'on', '>${REDIS_PASSWORD}', '~*', '&*', '+@all']
