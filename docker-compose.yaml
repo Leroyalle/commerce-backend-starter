@@ -14,7 +14,7 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:v1.35.0
-    container_name: electronic-meilisearch
+    container_name: backend-starter-meilisearch
     ports:
       - 7700:7700
     environment:
@@ -24,7 +24,7 @@ services:
 
   redis:
     image: 'redis:7.4-alpine'
-    container_name: 'electronic-redis'
+    container_name: 'backend-starter-redis'
     command:
       ['redis-server', '--user', '${REDIS_USER}', 'on', '>${REDIS_PASSWORD}', '~*', '&*', '+@all']
     ports:
@@ -34,7 +34,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: electronic-db
+    container_name: backend-starter-db
     ports:
       - '5888:5432'
     environment:
