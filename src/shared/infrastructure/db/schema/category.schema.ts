@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
-import { productSchema } from './product.schema';
+import { productsToCategories } from './products-to-categories.schema';
 
 export const categorySchema = pgTable('categories', {
   id: uuid().defaultRandom().primaryKey(),
@@ -9,5 +9,5 @@ export const categorySchema = pgTable('categories', {
 });
 
 export const categoryRelations = relations(categorySchema, ({ many }) => ({
-  products: many(productSchema),
+  productsToCategories: many(productsToCategories),
 }));
