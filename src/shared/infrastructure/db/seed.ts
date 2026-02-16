@@ -11,9 +11,9 @@ const { product, meilisearch, category } = await createModules();
 
 async function clear() {
   console.log('Clearing...');
+  await db.delete(productsToCategoriesSchema);
   await db.delete(productSchema);
   await db.delete(categorySchema);
-  await db.delete(productsToCategoriesSchema);
   await meilisearch.indexes.productIndex.deleteAllDocuments().waitTask();
 }
 
