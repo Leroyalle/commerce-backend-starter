@@ -336,22 +336,7 @@ export class AuthCommands {
     if (!linkOrCreateResult) throw NotFoundException.Account();
 
     switch (linkOrCreateResult.action) {
-      case AccountResultActions.LINK: {
-        const accessToken = await this.deps.tokenService.sign(linkOrCreateResult.account, 'access');
-        const refreshToken = await this.deps.tokenService.sign(
-          linkOrCreateResult.account,
-          'refresh',
-        );
-
-        return {
-          action: AccountResultActions.LINK,
-          status: 'success',
-          accessToken,
-          refreshToken,
-          message: 'Вы успешно вошли в аккаунт!',
-        };
-      }
-
+      case AccountResultActions.LINK:
       case AccountResultActions.CREATE: {
         const accessToken = await this.deps.tokenService.sign(linkOrCreateResult.account, 'access');
         const refreshToken = await this.deps.tokenService.sign(
@@ -359,8 +344,16 @@ export class AuthCommands {
           'refresh',
         );
 
+        await this.deps.tokenCommands.create({
+          accountId: linkOrCreateResult.account.id,
+          expAt: refreshToken.expAt,
+          token: await argon2.hash(refreshToken.token),
+          jti: refreshToken.jti,
+          revokedAt: null,
+        });
+
         return {
-          action: AccountResultActions.CREATE,
+          action: AccountResultActions.LINK,
           status: 'success',
           accessToken,
           refreshToken,
