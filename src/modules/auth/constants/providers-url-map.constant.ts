@@ -1,4 +1,4 @@
 export const providersUrlMap = {
-  GitHub: 'https://github.com/login/oauth/authorize',
+  GitHub: 'https://api.github.com/user',
   Yandex: 'https://login.yandex.ru/info',
 };

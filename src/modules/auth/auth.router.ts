@@ -82,15 +82,13 @@ export function createAuthRouter(deps: Deps): Hono {
 
   authRouter.get(
     '/login/:provider/callback',
-    deps.optionalAccessGuard,
     zValidator('param', oauthProviderZodSchema),
     zValidator('query', oauthCallbackZodSchema),
     async c => {
       const params = c.req.valid('param');
       const queryParams = c.req.valid('query');
-      const user = c.get('user');
       const storedState = getCookie(c, 'oauth_state') ?? '';
-      const result = await deps.commands.oauthLoginCallback(user, params.provider, {
+      const result = await deps.commands.oauthLoginCallback(params.provider, {
         ...queryParams,
         storedState,
       });

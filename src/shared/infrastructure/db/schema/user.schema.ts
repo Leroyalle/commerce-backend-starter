@@ -9,7 +9,7 @@ import { pgTimestamp } from './timestamp';
 export const userSchema = pgTable('users', {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
-  email: text().notNull(),
+  email: text().notNull().unique(),
   emailVerifiedAt: timestamp({ withTimezone: false }),
   ...pgTimestamp,
 });

@@ -5,6 +5,7 @@ import {
   InvalidCodeException,
   InvalidPasswordException,
   NotFoundException,
+  OAuthEmailRequiredException,
   SamePasswordException,
   UserAlreadyVerifiedException,
   UserNotVerifiedException,
@@ -18,6 +19,7 @@ import {
   AccountResultActions,
   TLinkOrCreateAccountResult,
 } from '@/shared/types/auth/link-or-create-account.type';
+import { GitHubEmail } from '@/shared/types/auth/oauth/github-user-info.type';
 import { TOauthLoginCallbackResult } from '@/shared/types/auth/oauth/oauth-login-callback.type';
 
 import { UserCommands } from '../user/user.commands';
@@ -27,7 +29,10 @@ import { IAccountCommands } from './account/account.commands';
 import { IAccountQueries } from './account/account.queries';
 import { CodeCommands } from './code/code.commands';
 import { CodeQueries } from './code/code.queries';
-import { TProvidersInfoMapConstant } from './constants/providers-info-map.constant';
+import {
+  TOAuthProfileMapped,
+  TProvidersInfoMapConstant,
+} from './constants/providers-info-map.constant';
 import { ProviderName, providersMap } from './constants/providers-map.constant';
 import { providersScopeMap } from './constants/providers-scope-map.constant';
 import { providersUrlMap } from './constants/providers-url-map.constant';
@@ -283,7 +288,6 @@ export class AuthCommands {
   }
 
   public async oauthLoginCallback(
-    user: User | undefined,
     providerName: ProviderName,
     data: { code: string; state: string; storedState: string },
   ): Promise<TOauthLoginCallbackResult> {
@@ -311,16 +315,17 @@ export class AuthCommands {
     let linkOrCreateResult: TLinkOrCreateAccountResult | undefined = undefined;
 
     if (isGithubResponse(response)) {
-      linkOrCreateResult = await this.linkOrCreateAccount(user, {
-        displayName: response.displayName,
+      if (!response.email) throw new OAuthEmailRequiredException(providerName);
+      linkOrCreateResult = await this.linkOrCreateAccount({
+        displayName: response.name ?? response.login,
         email: response.email,
-        providerId: response.externalId,
+        providerId: String(response.id),
         providerName,
       });
     }
 
     if (isYandexResponse(response)) {
-      linkOrCreateResult = await this.linkOrCreateAccount(user, {
+      linkOrCreateResult = await this.linkOrCreateAccount({
         displayName: response.first_name,
         email: response.default_email,
         providerId: response.id,
@@ -374,22 +379,14 @@ export class AuthCommands {
       default:
         throw NotFoundException.Account();
     }
-
-    // const accessToken = await this.deps.tokenService.sign(linkOrCreateResult, 'access');
-    // const refreshToken = await this.deps.tokenService.sign(linkOrCreateResult, 'refresh');
-
-    // return { status: 'success', accessToken, refreshToken };
   }
 
-  private async linkOrCreateAccount(
-    user: User | undefined,
-    data: {
-      providerId: string;
-      displayName: string;
-      email: string;
-      providerName: ProviderName;
-    },
-  ): Promise<TLinkOrCreateAccountResult> {
+  private async linkOrCreateAccount(data: {
+    providerId: string;
+    displayName: string;
+    email: string;
+    providerName: ProviderName;
+  }): Promise<TLinkOrCreateAccountResult> {
     const oauthAccount = await this.deps.accountQueries.findByProviderAccount(
       data.providerName,
       data.providerId,
@@ -397,17 +394,15 @@ export class AuthCommands {
 
     // TODO: сделать транзакцией
     if (oauthAccount) {
-      // await this.deps.userCommands.update(oauthAccount.userId, {
-      //   name: data.displayName,
-      // });
-
       return {
         account: oauthAccount,
         action: AccountResultActions.LINK,
       };
     }
 
-    if (user) {
+    const existingUser = await this.deps.userQueries.findByEmail(data.email);
+
+    if (existingUser) {
       const account = await this.deps.accountCommands.create({
         providerDetails: {
           providerAccountId: data.providerId,
@@ -415,7 +410,7 @@ export class AuthCommands {
         },
         account: {
           type: 'oauth',
-          userId: user.id,
+          userId: existingUser.id,
           provider: data.providerName,
           role: 'user',
         },
@@ -427,14 +422,10 @@ export class AuthCommands {
       };
     }
 
-    const existingUser = await this.deps.userQueries.findByEmail(data.email);
-
-    if (existingUser?.emailVerifiedAt) throw AlreadyExistsException.User();
-
     const createdUser = await this.deps.userCommands.create({
       email: data.email,
       name: data.displayName,
-      emailVerifiedAt: null,
+      emailVerifiedAt: new Date(),
     });
 
     const createdAccount = await this.deps.accountCommands.create({
@@ -450,19 +441,19 @@ export class AuthCommands {
       },
     });
 
-    const code = await this.deps.codeCommands.create({
-      accountId: createdAccount.id,
-      type: 'verify_email',
-    });
+    // const code = await this.deps.codeCommands.create({
+    //   accountId: createdAccount.id,
+    //   type: 'verify_email',
+    // });
 
-    await this.deps.notificationProducer.sendEmail('verify_email', {
-      email: createdUser.email,
-      code,
-    });
+    // await this.deps.notificationProducer.sendEmail('verify_email', {
+    //   email: createdUser.email,
+    //   code,
+    // });
 
     return {
       account: createdAccount,
-      action: AccountResultActions.SEND_CODE,
+      action: AccountResultActions.CREATE,
     };
   }
 
@@ -470,23 +461,50 @@ export class AuthCommands {
     providerName: T;
     accessToken: string;
     url: string;
-  }): Promise<TProvidersInfoMapConstant[T] | undefined> {
+  }): Promise<TOAuthProfileMapped[T] | undefined> {
     const { accessToken, providerName, url } = data;
     const response = await fetch(url, {
       headers: {
-        Authorization: `OAuth ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         Accept: 'application/json',
+        'User-Agent': 'electronic-store-backend',
       },
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Yandex API error: ${response.status} ${errorText}`);
+      throw new Error(`Get Oauth user data error: ${response.status} ${errorText}`);
     }
 
     switch (providerName) {
-      case 'Yandex':
-        return (await response.json()) as TProvidersInfoMapConstant[T];
+      case 'Yandex': {
+        const parsed = (await response.json()) as TProvidersInfoMapConstant['Yandex'];
+        const payload: TOAuthProfileMapped['Yandex'] = { ...parsed, provider: 'Yandex' };
+        return payload as TOAuthProfileMapped[T];
+      }
+
+      case 'GitHub': {
+        const userData = (await response.json()) as TProvidersInfoMapConstant['GitHub'];
+
+        const emailsResponse = await fetch(`${url}/emails`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'User-Agent': 'electronic-store-backend',
+          },
+        });
+
+        const emails = await emailsResponse.json();
+
+        userData.email = emails.find((e: GitHubEmail) => e.primary && e.verified)?.email;
+
+        const payload: TOAuthProfileMapped['GitHub'] = {
+          ...userData,
+          provider: 'GitHub',
+        };
+        return payload as TOAuthProfileMapped[T];
+      }
+      default:
+        throw NotFoundException.Account();
     }
   }
   // public async findByJti(jti: string) {
