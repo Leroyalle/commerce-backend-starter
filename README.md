@@ -1,7 +1,7 @@
 # E-commerce Backend Starter
 
 Репозиторий предназначен для использования как стартовая точка под интернет-магазин.\
-Проект предоставляет готовый backend-каркас: пользователи, продукты, заказы, поиск, авторизация, очереди и уведомления.
+Проект предоставляет готовый backend-каркас: пользователи, продукты, заказы, поиск, авторизация (credentials + OAuth), очереди и уведомления.
 
 ---
 
@@ -18,7 +18,11 @@
 
 ## Features
 
-- Auth (access / refresh tokens)
+- Auth
+  - Credentials (email + password)
+  - OAuth (Yandex, GitHub)
+  - Access / Refresh tokens
+  - Account linking
 - Users
 - Products + MeiliSearch
 - Orders (без оплаты)
