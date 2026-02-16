@@ -2,7 +2,7 @@ import { count, desc, eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
 import { Product, productSchema } from '@/shared/infrastructure/db/schema/product.schema';
-import { productsToCategories } from '@/shared/infrastructure/db/schema/products-to-categories.schema';
+import { productsToCategoriesSchema } from '@/shared/infrastructure/db/schema/products-to-categories.schema';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 import { IPagination } from '@/shared/types/pagination.type';
 
@@ -27,7 +27,7 @@ export class ProductRepo implements IProductRepository {
     const [product] = await db.insert(productSchema).values(data).returning();
 
     for (const categoryId of data.categories) {
-      await db.insert(productsToCategories).values({
+      await db.insert(productsToCategoriesSchema).values({
         productId: product.id,
         categoryId: categoryId,
       });

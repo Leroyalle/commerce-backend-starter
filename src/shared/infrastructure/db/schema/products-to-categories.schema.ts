@@ -4,7 +4,7 @@ import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core';
 import { categorySchema } from './category.schema';
 import { productSchema } from './product.schema';
 
-export const productsToCategories = pgTable(
+export const productsToCategoriesSchema = pgTable(
   'products_to_categories',
   {
     productId: uuid('product_id')
@@ -17,13 +17,13 @@ export const productsToCategories = pgTable(
   table => [primaryKey({ columns: [table.productId, table.categoryId] })],
 );
 
-export const productsToCategoriesRelations = relations(productsToCategories, ({ one }) => ({
+export const productsToCategoriesRelations = relations(productsToCategoriesSchema, ({ one }) => ({
   category: one(categorySchema, {
-    fields: [productsToCategories.categoryId],
+    fields: [productsToCategoriesSchema.categoryId],
     references: [categorySchema.id],
   }),
   product: one(productSchema, {
-    fields: [productsToCategories.productId],
+    fields: [productsToCategoriesSchema.productId],
     references: [productSchema.id],
   }),
 }));

@@ -2,7 +2,7 @@ import { InferSelectModel, relations } from 'drizzle-orm';
 import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { cartItemSchema } from './cart-item.schema';
-import { productsToCategories } from './products-to-categories.schema';
+import { productsToCategoriesSchema } from './products-to-categories.schema';
 import { pgTimestamp } from './timestamp';
 
 export const productSchema = pgTable('products', {
@@ -16,7 +16,7 @@ export const productSchema = pgTable('products', {
 
 export const productRelations = relations(productSchema, ({ many }) => ({
   cartItems: many(cartItemSchema),
-  productsToCategories: many(productsToCategories),
+  productsToCategories: many(productsToCategoriesSchema),
 }));
 
 export type Product = InferSelectModel<typeof productSchema>;

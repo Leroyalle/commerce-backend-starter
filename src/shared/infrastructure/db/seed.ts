@@ -3,14 +3,17 @@ import { faker } from '@faker-js/faker/locale/ru';
 import { createModules } from '@/modules';
 
 import { db } from './client';
-import { Category } from './schema/category.schema';
+import { Category, categorySchema } from './schema/category.schema';
 import { productSchema } from './schema/product.schema';
+import { productsToCategoriesSchema } from './schema/products-to-categories.schema';
 
 const { product, meilisearch, category } = await createModules();
 
 async function clear() {
   console.log('Clearing...');
   await db.delete(productSchema);
+  await db.delete(categorySchema);
+  await db.delete(productsToCategoriesSchema);
   await meilisearch.indexes.productIndex.deleteAllDocuments().waitTask();
 }
 
