@@ -1,8 +1,11 @@
-import { GitHubUserAuthDTO } from '@/shared/types/auth/oauth/github-user-info.type';
-import { YandexUserinfo } from '@/shared/types/auth/oauth/yandex-user-info.type';
+import {
+  TOauthProfileMap,
+  TOAuthProfileMapped,
+} from '@/modules/auth/constants/providers-info-map.constant';
+import { ProviderName } from '@/modules/auth/constants/providers-map.constant';
 
 export function isGithubResponse(
-  res: GitHubUserAuthDTO | YandexUserinfo,
-): res is GitHubUserAuthDTO {
-  return res && 'provider' in res && res.provider === 'github';
+  res: TOAuthProfileMapped[ProviderName],
+): res is TOauthProfileMap<'GitHub'> {
+  return res && 'provider' in res && res.provider === 'GitHub';
 }
