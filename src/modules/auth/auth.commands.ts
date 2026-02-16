@@ -10,11 +10,15 @@ import {
   UserNotVerifiedException,
 } from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
-import { Account } from '@/shared/infrastructure/db/schema/account.schema';
 import { User } from '@/shared/infrastructure/db/schema/user.schema';
 import { isGithubResponse } from '@/shared/lib/guards/is-github-response.guard';
 import { isYandexResponse } from '@/shared/lib/guards/is-yandex-response.guard';
 import { SuccessAuthResult } from '@/shared/types/auth-result.type';
+import {
+  AccountResultActions,
+  TLinkOrCreateAccountResult,
+} from '@/shared/types/auth/link-or-create-account.type';
+import { TOauthLoginCallbackResult } from '@/shared/types/auth/oauth/oauth-login-callback.type';
 
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
@@ -123,7 +127,7 @@ export class AuthCommands {
     const findUser = await this.deps.userQueries.findByEmail(email);
 
     if (!findUser) throw NotFoundException.User();
-    const account = findUser.accounts.find(acc => acc.credentialsAccount);
+    const account = findUser.accounts.find(acc => acc.credentialsAccount || acc.oauthAccount);
 
     if (!account) throw NotFoundException.Account();
 
@@ -282,7 +286,7 @@ export class AuthCommands {
     user: User | undefined,
     providerName: ProviderName,
     data: { code: string; state: string; storedState: string },
-  ) {
+  ): Promise<TOauthLoginCallbackResult> {
     const { code, storedState, state } = data;
     if (!code || !state || state !== storedState) {
       throw new InvalidCodeException('Invalid code or state');
@@ -304,10 +308,10 @@ export class AuthCommands {
       throw NotFoundException.User();
     }
 
-    let account: Account | undefined = undefined;
+    let linkOrCreateResult: TLinkOrCreateAccountResult | undefined = undefined;
 
     if (isGithubResponse(response)) {
-      account = await this.findAndUpdateAccount(user, {
+      linkOrCreateResult = await this.linkOrCreateAccount(user, {
         displayName: response.displayName,
         email: response.email,
         providerId: response.externalId,
@@ -316,7 +320,7 @@ export class AuthCommands {
     }
 
     if (isYandexResponse(response)) {
-      account = await this.findAndUpdateAccount(user, {
+      linkOrCreateResult = await this.linkOrCreateAccount(user, {
         displayName: response.first_name,
         email: response.default_email,
         providerId: response.id,
@@ -324,15 +328,60 @@ export class AuthCommands {
       });
     }
 
-    if (!account) throw NotFoundException.Account();
+    if (!linkOrCreateResult) throw NotFoundException.Account();
 
-    const accessToken = await this.deps.tokenService.sign(account, 'access');
-    const refreshToken = await this.deps.tokenService.sign(account, 'refresh');
+    switch (linkOrCreateResult.action) {
+      case AccountResultActions.LINK: {
+        const accessToken = await this.deps.tokenService.sign(linkOrCreateResult.account, 'access');
+        const refreshToken = await this.deps.tokenService.sign(
+          linkOrCreateResult.account,
+          'refresh',
+        );
 
-    return { status: 'success', accessToken, refreshToken };
+        return {
+          action: AccountResultActions.LINK,
+          status: 'success',
+          accessToken,
+          refreshToken,
+          message: 'Вы успешно вошли в аккаунт!',
+        };
+      }
+
+      case AccountResultActions.CREATE: {
+        const accessToken = await this.deps.tokenService.sign(linkOrCreateResult.account, 'access');
+        const refreshToken = await this.deps.tokenService.sign(
+          linkOrCreateResult.account,
+          'refresh',
+        );
+
+        return {
+          action: AccountResultActions.CREATE,
+          status: 'success',
+          accessToken,
+          refreshToken,
+          message: 'Вы успешно вошли в аккаунт!',
+        };
+      }
+
+      case AccountResultActions.SEND_CODE: {
+        return {
+          action: AccountResultActions.SEND_CODE,
+          status: 'success',
+          message: 'Письмо с кодом подтверждения отправлено на ваш email!',
+        };
+      }
+
+      default:
+        throw NotFoundException.Account();
+    }
+
+    // const accessToken = await this.deps.tokenService.sign(linkOrCreateResult, 'access');
+    // const refreshToken = await this.deps.tokenService.sign(linkOrCreateResult, 'refresh');
+
+    // return { status: 'success', accessToken, refreshToken };
   }
 
-  private async findAndUpdateAccount(
+  private async linkOrCreateAccount(
     user: User | undefined,
     data: {
       providerId: string;
@@ -340,7 +389,7 @@ export class AuthCommands {
       email: string;
       providerName: ProviderName;
     },
-  ): Promise<Account | undefined> {
+  ): Promise<TLinkOrCreateAccountResult> {
     const oauthAccount = await this.deps.accountQueries.findByProviderAccount(
       data.providerName,
       data.providerId,
@@ -352,11 +401,14 @@ export class AuthCommands {
       //   name: data.displayName,
       // });
 
-      return oauthAccount;
+      return {
+        account: oauthAccount,
+        action: AccountResultActions.LINK,
+      };
     }
 
     if (user) {
-      return await this.deps.accountCommands.create({
+      const account = await this.deps.accountCommands.create({
         providerDetails: {
           providerAccountId: data.providerId,
           type: 'oauth',
@@ -368,6 +420,11 @@ export class AuthCommands {
           role: 'user',
         },
       });
+
+      return {
+        account,
+        action: AccountResultActions.CREATE,
+      };
     }
 
     const existingUser = await this.deps.userQueries.findByEmail(data.email);
@@ -403,7 +460,10 @@ export class AuthCommands {
       code,
     });
 
-    return createdAccount;
+    return {
+      account: createdAccount,
+      action: AccountResultActions.SEND_CODE,
+    };
   }
 
   public async getUserOauthData<T extends keyof TProvidersInfoMapConstant>(data: {

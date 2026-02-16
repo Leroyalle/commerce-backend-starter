@@ -3,6 +3,7 @@ import { Hono, MiddlewareHandler } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 
 import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
+import { AccountResultActions } from '@/shared/types/auth/link-or-create-account.type';
 
 import { AuthCommands } from './auth.commands';
 import { loginZodSchema } from './schemas/login.schema';
@@ -93,6 +94,10 @@ export function createAuthRouter(deps: Deps): Hono {
         ...queryParams,
         storedState,
       });
+
+      if (result?.action === AccountResultActions.SEND_CODE) {
+        return c.json(result.message, 201);
+      }
 
       setCookie(c, 'refreshToken', result.refreshToken.token, {
         httpOnly: true,

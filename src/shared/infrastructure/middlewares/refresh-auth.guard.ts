@@ -20,8 +20,6 @@ export function refreshGuard(
 
     const { payload } = await authCommands.verifyToken(refreshTokenCookie, 'refresh');
 
-    console.log('payload', payload);
-
     const refreshToken = await authQueries.findByJti(payload.jti);
 
     if (!refreshToken || refreshToken.revokedAt) {
@@ -29,8 +27,6 @@ export function refreshGuard(
     }
 
     const account = await authQueries.findAccountById(payload.sub);
-
-    console.log(account);
 
     if (!account || !account.userId) {
       return c.json({ error: 'Unauthorized' }, 401);

@@ -94,7 +94,6 @@ export class AccountRepo implements IAccountRepository {
   ): Promise<Account> {
     return db.transaction(async tx => {
       const [account] = await tx.insert(accountSchema).values(data.account).returning();
-      console.log('data after insert account', data);
       if (data.providerDetails.type === 'oauth') {
         await tx
           .insert(oauthAccountSchema)
