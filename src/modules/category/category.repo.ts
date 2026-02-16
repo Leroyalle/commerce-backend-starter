@@ -1,7 +1,7 @@
 import { DB } from '@/shared/infrastructure/db/client';
 import { Category, categorySchema } from '@/shared/infrastructure/db/schema/category.schema';
 
-export interface ICategoryRepo {
+export interface ICategoryRepository {
   getAll: () => Promise<Category[]>;
   create: (data: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Category>;
 }
@@ -10,7 +10,7 @@ interface Deps {
   db: DB;
 }
 
-export class CategoryRepo implements ICategoryRepo {
+export class CategoryRepo implements ICategoryRepository {
   constructor(private readonly deps: Deps) {}
 
   public async getAll() {

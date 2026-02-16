@@ -1,18 +1,19 @@
-import { DB } from '@/shared/infrastructure/db/client';
 import { Category } from '@/shared/infrastructure/db/schema/category.schema';
+
+import { ICategoryRepository } from './category.repo';
 
 export interface ICategoryQueries {
   findAll: () => Promise<Category[]>;
 }
 
 interface Deps {
-  db: DB;
+  repository: ICategoryRepository;
 }
 
 export class CategoryQueries implements ICategoryQueries {
   constructor(private readonly deps: Deps) {}
 
   public async findAll() {
-    return await this.deps.db.query.categorySchema.findMany();
+    return await this.deps.repository.getAll();
   }
 }
