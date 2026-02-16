@@ -8,7 +8,7 @@ import {
 
 export interface ITokenRepository {
   create: (token: Omit<RefreshToken, 'id'>) => Promise<RefreshToken>;
-  findValidByUserId: (userId: string) => Promise<RefreshToken | undefined>;
+  findValidByUserId: (accountId: string) => Promise<RefreshToken | undefined>;
   findByJti: (jti: string) => Promise<RefreshToken | undefined>;
 }
 
@@ -19,7 +19,7 @@ export class TokenRepo implements ITokenRepository {
 
   public async findValidByUserId(userId: string) {
     return await db.query.refreshTokenSchema.findFirst({
-      where: and(eq(refreshTokenSchema.userId, userId), isNull(refreshTokenSchema.revokedAt)),
+      where: and(eq(refreshTokenSchema.accountId, userId), isNull(refreshTokenSchema.revokedAt)),
     });
   }
   public async findByJti(jti: string) {

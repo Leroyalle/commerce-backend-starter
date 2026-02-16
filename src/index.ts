@@ -43,7 +43,12 @@ app.onError((err, c) => {
 });
 
 const { auth, cart, order, product, user, meilisearch } = await createModules();
-const { accessGuard, refreshGuard } = createMiddlewares({ authCommands: auth.commands });
+
+const { accessGuard, refreshGuard, optionalAccessGuard } = createMiddlewares({
+  authCommands: auth.commands,
+  authQueries: auth.queries,
+  userQueries: user.queries,
+});
 
 const userRouter = createUserRouter({
   commands: user.commands,
@@ -51,7 +56,12 @@ const userRouter = createUserRouter({
   accessAuthMiddleware: accessGuard,
 });
 
-const authRouter = createAuthRouter({ commands: auth.commands, refreshGuard, accessGuard });
+const authRouter = createAuthRouter({
+  commands: auth.commands,
+  refreshGuard,
+  accessGuard,
+  optionalAccessGuard,
+});
 
 const productRouter = createProductRouter({
   commands: product.commands,

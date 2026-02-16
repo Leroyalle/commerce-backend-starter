@@ -1,5 +1,8 @@
+import { User } from '../infrastructure/db/schema/user.schema';
+
 export type AuthVars = {
-  userId: string;
+  user: User;
+  accountId: string;
   role?: 'user' | 'admin';
 };
 

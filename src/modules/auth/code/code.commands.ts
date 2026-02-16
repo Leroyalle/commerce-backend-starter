@@ -9,9 +9,9 @@ interface Deps {
 
 export class CodeCommands {
   constructor(private readonly deps: Deps) {}
-  public async create(data: Pick<IAuthCode, 'userId' | 'type'>) {
+  public async create(data: Pick<IAuthCode, 'accountId' | 'type'>) {
     const code = crypto.randomInt(1000, 10000);
-    await this.deps.redis.set(`auth:code:${data.type}:${data.userId}`, code, 'EX', 3600);
+    await this.deps.redis.set(`auth:code:${data.type}:${data.accountId}`, code, 'EX', 3600);
     return code;
   }
 }

@@ -14,6 +14,9 @@ export class NotFoundException extends DomainException {
   public static User() {
     return new NotFoundException('Пользователь');
   }
+  public static Account() {
+    return new NotFoundException('Аккаунт');
+  }
   public static Product() {
     return new NotFoundException('Товар');
   }
@@ -51,6 +54,7 @@ export class AlreadyExistsException extends DomainException {
 }
 
 export abstract class AuthException extends DomainException {}
+
 export class UserNotVerifiedException extends AuthException {}
 export class InvalidPasswordException extends AuthException {}
 export class SamePasswordException extends AuthException {}
@@ -59,6 +63,13 @@ export class InvalidTokenException extends AuthException {}
 export class RoleForbiddenException extends AuthException {}
 export class InvalidCodeException extends AuthException {}
 export class UserAlreadyVerifiedException extends AuthException {}
+export class OAuthEmailRequiredException extends AuthException {
+  constructor(provider: string) {
+    super(
+      `Провайдер ${provider} не предоставил адрес электронной почты. Пожалуйста, сделайте email публичным в настройках аккаунта.`,
+    );
+  }
+}
 
 export abstract class ProductException extends DomainException {}
 export class ProductOutOfStockException extends ProductException {}

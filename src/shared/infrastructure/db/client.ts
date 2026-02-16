@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 
 import { getEnv } from '../../lib/helpers/get-env.helper';
 
+import * as accountSchema from './schema/account.schema';
 import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';
 import * as dataCounterSchema from './schema/data-counter.schema';
@@ -22,13 +23,14 @@ const client = new Pool({
 
 const schema = {
   ...cartSchema,
+  ...userSchema,
+  ...accountSchema,
   ...cartItemSchema,
   ...productSchema,
-  ...userSchema,
   ...orderSchema,
   ...refreshTokenSchema,
   ...dataCounterSchema,
-};
+} as const;
 
 export const db = drizzle(client, {
   schema,

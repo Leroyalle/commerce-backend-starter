@@ -1,7 +1,7 @@
 import { decodeJwt, jwtVerify, SignJWT } from 'jose';
 
 import { timeMap } from '@/shared/constants/tokens-time-map.constants';
-import { RoleEnum } from '@/shared/infrastructure/db/schema/user.schema';
+import { RoleEnum } from '@/shared/infrastructure/db/schema/account.schema';
 import { SignReturnValue } from '@/shared/types/sign-return-value.type';
 import {
   AccessPayload,

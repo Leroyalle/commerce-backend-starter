@@ -1,12 +1,16 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono, MiddlewareHandler } from 'hono';
-import { setCookie } from 'hono/cookie';
+import { getCookie, setCookie } from 'hono/cookie';
 
 import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
+import { AccountResultActions } from '@/shared/types/auth/link-or-create-account.type';
 
 import { AuthCommands } from './auth.commands';
 import { loginZodSchema } from './schemas/login.schema';
+import { oauthCallbackZodSchema } from './schemas/oauth-callback.schema';
+import { oauthProviderZodSchema } from './schemas/oauth-provider.schema';
 import { registerZodSchema } from './schemas/register.schema';
+import { resetPasswordZodSchema } from './schemas/reset-password.schema';
 import {
   verifyEmailCodeZodSchema,
   verifyPasswordCodeZodSchema,
@@ -18,6 +22,7 @@ interface Deps {
     Variables: RefreshAuthVars;
   }>;
   accessGuard: MiddlewareHandler<{ Variables: AuthVars }>;
+  optionalAccessGuard: MiddlewareHandler<{ Variables: Partial<AuthVars> }>;
 }
 export function createAuthRouter(deps: Deps): Hono {
   const authRouter = new Hono();
@@ -57,14 +62,62 @@ export function createAuthRouter(deps: Deps): Hono {
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
 
+  authRouter.get(
+    '/login/:provider',
+    deps.optionalAccessGuard,
+    zValidator('param', oauthProviderZodSchema),
+    c => {
+      const params = c.req.valid('param');
+      const result = deps.commands.oauthLogin(params.provider);
+      setCookie(c, 'oauth_state', result.state, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 10,
+        sameSite: 'Lax',
+      });
+      return c.redirect(result.url);
+    },
+  );
+
+  authRouter.get(
+    '/login/:provider/callback',
+    zValidator('param', oauthProviderZodSchema),
+    zValidator('query', oauthCallbackZodSchema),
+    async c => {
+      const params = c.req.valid('param');
+      const queryParams = c.req.valid('query');
+      const storedState = getCookie(c, 'oauth_state') ?? '';
+      const result = await deps.commands.oauthLoginCallback(params.provider, {
+        ...queryParams,
+        storedState,
+      });
+
+      if (result?.action === AccountResultActions.SEND_CODE) {
+        return c.json(result.message, 201);
+      }
+
+      setCookie(c, 'refreshToken', result.refreshToken.token, {
+        httpOnly: true,
+        // secure: true,
+        sameSite: 'strict',
+        path: '/',
+        expires: result.refreshToken.expAt,
+      });
+
+      return c.json({ accessToken: result.accessToken }, 201);
+    },
+  );
+
   authRouter.post(
     '/reset-password',
     deps.accessGuard,
-    zValidator('json', loginZodSchema),
+    zValidator('json', resetPasswordZodSchema),
     async c => {
       const body = c.req.valid('json');
-      const userId = c.get('userId');
-      await deps.commands.resetPassword(userId, body.password);
+      const user = c.get('user');
+      const accountId = c.get('accountId');
+      await deps.commands.resetPassword(user, accountId, body.password);
       return c.json(
         {
           message: 'Письмо с кодом подтверждения отправлено на ваш email',
@@ -80,8 +133,10 @@ export function createAuthRouter(deps: Deps): Hono {
     zValidator('json', verifyPasswordCodeZodSchema),
     async c => {
       const body = c.req.valid('json');
-      const userId = c.get('userId');
-      await deps.commands.verifyPasswordCode(userId, body.code, body.newPassword);
+      const user = c.get('user');
+      const accountId = c.get('accountId');
+
+      await deps.commands.verifyPasswordCode(user, accountId, body.code, body.newPassword);
       return c.json(
         {
           message: 'Пароль успешно изменен!',
@@ -92,9 +147,9 @@ export function createAuthRouter(deps: Deps): Hono {
   );
 
   authRouter.post('/refresh', deps.refreshGuard, async c => {
-    const userId = c.get('userId');
+    const accountId = c.get('accountId');
     const jti = c.get('jti');
-    const result = await deps.commands.refresh(userId, jti);
+    const result = await deps.commands.refresh(accountId, jti);
     setCookie(c, 'refreshToken', result.refreshToken.token, {
       httpOnly: true,
       // secure: true,
