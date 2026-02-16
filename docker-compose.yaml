@@ -16,7 +16,7 @@ services:
     image: getmeili/meilisearch:v1.35.0
     container_name: backend-starter-meilisearch
     ports:
-      - 7700:7700
+      - ${MEILI_PORT}:7700
     environment:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
     volumes:
@@ -28,7 +28,7 @@ services:
     command:
       ['redis-server', '--user', '${REDIS_USER}', 'on', '>${REDIS_PASSWORD}', '~*', '&*', '+@all']
     ports:
-      - 6777:6379
+      - ${REDIS_PORT}:6379
     volumes:
       - redis_data:/data
 
@@ -36,7 +36,7 @@ services:
     image: postgres:16-alpine
     container_name: backend-starter-db
     ports:
-      - '5888:5432'
+      - '${DB_PORT}:5432'
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
