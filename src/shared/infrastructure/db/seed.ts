@@ -3,9 +3,10 @@ import { faker } from '@faker-js/faker/locale/ru';
 import { createModules } from '@/modules';
 
 import { db } from './client';
+import { Category } from './schema/category.schema';
 import { productSchema } from './schema/product.schema';
 
-const { product, meilisearch } = await createModules();
+const { product, meilisearch, category } = await createModules();
 
 async function clear() {
   console.log('Clearing...');
@@ -15,14 +16,27 @@ async function clear() {
 
 async function seed() {
   console.log('Seeding data...');
+  const categories: Category[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const name = faker.commerce.department();
+    const createdCategory = await category.commands.create({ name });
+    categories.push(createdCategory);
+  }
 
   for (let i = 0; i < 10; i++) {
     const name = faker.commerce.productName();
     const aliases = [name, name.toLowerCase(), name.replace(/\s+/g, '')];
+    const randomIds = new Set([
+      categories[Math.floor(Math.random() * 10)].id,
+      categories[Math.floor(Math.random() * 10)].id,
+    ]);
+
     await product.commands.create({
       name,
       price: faker.number.int({ min: 1, max: 100_000 }),
       aliases,
+      categories: Array.from(randomIds),
     });
   }
 }
