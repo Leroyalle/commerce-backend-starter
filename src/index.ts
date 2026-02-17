@@ -1,4 +1,5 @@
-import { Hono } from 'hono';
+import { OpenAPIHono } from '@hono/zod-openapi';
+import { Scalar } from '@scalar/hono-api-reference';
 import { cors } from 'hono/cors';
 
 import { createMiddlewares } from './middlewares';
@@ -12,7 +13,21 @@ import { createUserRouter } from './modules/user/user.router';
 import { ERROR_HTTP_STATUS } from './shared/exceptions/error-status-map';
 import { resolveErrorCode } from './shared/exceptions/resolve-error-code';
 
-const app = new Hono().basePath('/api');
+const app = new OpenAPIHono().basePath('/api');
+
+app.doc('/openapi.json', {
+  openapi: '3.0.0',
+  info: {
+    title: 'Ecommerce Backend Starter',
+    version: '1.0.0',
+  },
+});
+app.get(
+  '/docs',
+  Scalar({
+    url: '/api/openapi.json',
+  }),
+);
 
 app.use(
   '*',
