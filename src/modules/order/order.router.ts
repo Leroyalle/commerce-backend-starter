@@ -1,6 +1,7 @@
 import { $, createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 
+import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
 import { orderSelectScheme } from '@/shared/infrastructure/db/schema/order.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
@@ -20,6 +21,7 @@ export function createOrderRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars
 
   const getOrdersRoute = createRoute({
     summary: 'Получить список заказов',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     tags: ['Orders'],
     description: 'Получить список заказов',
     method: 'get',
@@ -45,6 +47,7 @@ export function createOrderRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars
 
   const createOrderRoute = createRoute({
     description: 'Создать заказ',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     tags: ['Orders'],
     summary: 'Создает заказ',
     method: 'post',

@@ -1,6 +1,7 @@
 import { $, createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 
+import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
 import { cartSelectSchema } from '@/shared/infrastructure/db/schema/cart.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
@@ -24,6 +25,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
     description: 'Возвращает корзину',
     tags: ['Cart'],
     method: 'get',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     path: '/',
     responses: {
       200: {
@@ -61,6 +63,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
   const addItemRoute = createRoute({
     tags: ['Cart'],
     method: 'post',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     path: '/items',
     summary: 'Добавляет товар в корзину',
     description: 'Добавляет товар в корзину',
@@ -85,7 +88,6 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
     },
   });
 
-  // deps.accessAuthMiddleware,
   $(router).use(addItemRoute.path, deps.accessAuthMiddleware);
 
   router.openapi(addItemRoute, async c => {
@@ -98,6 +100,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
   const deleteFromCartRoute = createRoute({
     method: 'delete',
     tags: ['Cart'],
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     path: '/items/:id',
     summary: 'Удаляет товар из корзины',
     description: 'Удаляет товар из корзины',
@@ -128,6 +131,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
   const decreaseQuantityRoute = createRoute({
     method: 'put',
     tags: ['Cart'],
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     path: '/items/:id',
     summary: 'Увеличивает количество товара в корзине',
     description: 'Увеличивает количество товара в корзине',
@@ -159,6 +163,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
     tags: ['Cart'],
     path: '/',
     summary: 'Очищает корзину',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     description: 'Очищает корзину',
     responses: {
       201: {

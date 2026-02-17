@@ -1,6 +1,7 @@
 import { $, createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 
+import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
 import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { userSelectSchema } from '@/shared/infrastructure/db/schema/user.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
@@ -22,6 +23,7 @@ export function createUserRouter(deps: CreateUserRouterDeps): OpenAPIHono<{ Vari
     method: 'get',
     path: '/me',
     summary: 'Получить профиль',
+    security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
     tags: ['Users'],
     description: 'Возвращает данные текущего авторизованного пользователя',
     responses: {

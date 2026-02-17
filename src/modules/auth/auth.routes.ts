@@ -1,5 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 
+import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
+
 import { accessTokenResponseSchema } from './schemas/access-token-response.schema';
 import { loginZodSchema } from './schemas/login.schema';
 import { oauthCallbackZodSchema } from './schemas/oauth-callback.schema';
@@ -150,6 +152,7 @@ export const resetPasswordRoute = createRoute({
   method: 'post',
   summary: 'Сброс пароля',
   description: 'Сброс пароля',
+  security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
   request: {
     body: {
       content: {
@@ -177,6 +180,7 @@ export const verifyPasswordCodeRoute = createRoute({
   path: '/verify-password',
   method: 'post',
   tags: ['Auth'],
+  security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
   summary: 'Подтверждение сброса пароля',
   description: 'Подтверждение сброса пароля',
   request: {
@@ -207,6 +211,7 @@ export const refreshRoute = createRoute({
   method: 'post',
   tags: ['Auth'],
   summary: 'Обновление токена',
+  security: [{ [SECURITY_SCHEMES.REFRESH_TOKEN_COOKIE]: [] }],
   description: 'Обновление токена',
   responses: {
     201: {
