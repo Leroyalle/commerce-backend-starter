@@ -22,6 +22,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
   const getCartRoute = createRoute({
     summary: 'Возвращает корзину пользователю',
     description: 'Возвращает корзину',
+    tags: ['Cart'],
     method: 'get',
     path: '/',
     responses: {
@@ -58,6 +59,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
   });
 
   const addItemRoute = createRoute({
+    tags: ['Cart'],
     method: 'post',
     path: '/items',
     summary: 'Добавляет товар в корзину',
@@ -95,6 +97,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
 
   const deleteFromCartRoute = createRoute({
     method: 'delete',
+    tags: ['Cart'],
     path: '/items/:id',
     summary: 'Удаляет товар из корзины',
     description: 'Удаляет товар из корзины',
@@ -124,6 +127,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
 
   const decreaseQuantityRoute = createRoute({
     method: 'put',
+    tags: ['Cart'],
     path: '/items/:id',
     summary: 'Увеличивает количество товара в корзине',
     description: 'Увеличивает количество товара в корзине',
@@ -152,6 +156,7 @@ export function createCartRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars 
 
   const clearCartRoute = createRoute({
     method: 'delete',
+    tags: ['Cart'],
     path: '/',
     summary: 'Очищает корзину',
     description: 'Очищает корзину',

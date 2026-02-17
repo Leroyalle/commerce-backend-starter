@@ -45,6 +45,7 @@ export function createAuthRouter(
   const registerRoute = createRoute({
     path: '/register',
     method: 'post',
+    tags: ['Auth'],
     summary: 'Регистрация',
     description: 'Регистрация',
     request: {
@@ -78,6 +79,7 @@ export function createAuthRouter(
 
   const verifyEmailRoute = createRoute({
     path: '/verify-email',
+    tags: ['Auth'],
     method: 'post',
     summary: 'Подтверждение email',
     description: 'Подтверждение email',
@@ -128,6 +130,7 @@ export function createAuthRouter(
     path: '/login',
     method: 'post',
     summary: 'Авторизация',
+    tags: ['Auth'],
     description: 'Авторизация',
     request: {
       body: {
@@ -171,6 +174,7 @@ export function createAuthRouter(
 
   const loginByProviderRoute = createRoute({
     path: '/login/:provider',
+    tags: ['Auth'],
     method: 'get',
     summary: 'Авторизация через провайдер',
     description: 'Авторизация через провайдер',
@@ -210,6 +214,7 @@ export function createAuthRouter(
   const loginByProviderCallbackSchema = createRoute({
     path: '/login/:provider/callback',
     method: 'get',
+    tags: ['Auth'],
     summary: 'Авторизация через провайдер',
     description: 'Авторизация через провайдер',
     request: {
@@ -254,6 +259,7 @@ export function createAuthRouter(
 
   const resetPasswordRoute = createRoute({
     path: '/reset-password',
+    tags: ['Auth'],
     method: 'post',
     summary: 'Сброс пароля',
     description: 'Сброс пароля',
@@ -298,6 +304,7 @@ export function createAuthRouter(
   const verifyPasswordCodeRoute = createRoute({
     path: '/verify-password',
     method: 'post',
+    tags: ['Auth'],
     summary: 'Подтверждение сброса пароля',
     description: 'Подтверждение сброса пароля',
     request: {
@@ -342,6 +349,7 @@ export function createAuthRouter(
   const refreshRoute = createRoute({
     path: '/refresh',
     method: 'post',
+    tags: ['Auth'],
     summary: 'Обновление токена',
     description: 'Обновление токена',
     responses: {

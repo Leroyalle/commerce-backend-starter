@@ -21,6 +21,13 @@ app.doc('/openapi.json', {
     title: 'Ecommerce Backend Starter',
     version: '1.0.0',
   },
+  tags: [
+    { name: 'Auth', description: 'Авторизация и аутентификация' },
+    { name: 'Products', description: 'Работа с продуктами' },
+    { name: 'Categories', description: 'Работа с категориями' },
+    { name: 'Cart', description: 'Корзина пользователя' },
+    { name: 'Orders', description: 'Заказы пользователя' },
+  ],
 });
 
 app.get(

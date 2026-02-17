@@ -22,6 +22,7 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
     description: 'Получить список продуктов',
     summary: 'Получить список продуктов',
     method: 'get',
+    tags: ['Products'],
     path: '/',
     request: {
       query: findProductsZodSchema,
@@ -49,6 +50,7 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
 
   const createPostRoute = createRoute({
     description: 'Создать продукт',
+    tags: ['Products'],
     summary: 'Создать продукт',
     method: 'post',
     path: '/',
@@ -83,6 +85,7 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
   const getProductByIdRoute = createRoute({
     description: 'Получить продукт по id',
     summary: 'Получить продукт по id',
+    tags: ['Products'],
     method: 'get',
     path: '/:id',
     request: {

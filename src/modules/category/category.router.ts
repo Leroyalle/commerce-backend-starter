@@ -18,6 +18,7 @@ export function createCategoryRouter(deps: Deps) {
   const getAllRoute = createRoute({
     method: 'get',
     path: '/',
+    tags: ['Categories'],
     summary: 'Получить все категории',
     description: 'Ищет все доступные категории',
     responses: {
@@ -39,6 +40,7 @@ export function createCategoryRouter(deps: Deps) {
 
   const createCategoryRoute = createRoute({
     method: 'post',
+    tags: ['Categories'],
     path: '/',
     summary: 'Создает категорию',
     description: 'Создает категорию',

@@ -22,6 +22,7 @@ export function createUserRouter(deps: CreateUserRouterDeps): OpenAPIHono<{ Vari
     method: 'get',
     path: '/me',
     summary: 'Получить профиль',
+    tags: ['Users'],
     description: 'Возвращает данные текущего авторизованного пользователя',
     responses: {
       200: {
@@ -47,6 +48,7 @@ export function createUserRouter(deps: CreateUserRouterDeps): OpenAPIHono<{ Vari
 
   const byIdRoute = createRoute({
     method: 'get',
+    tags: ['Users'],
     path: '/:id',
     summary: 'Получить профиль по айди',
     description: 'Возвращает данные пользователя',

@@ -20,6 +20,7 @@ export function createOrderRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars
 
   const getOrdersRoute = createRoute({
     summary: 'Получить список заказов',
+    tags: ['Orders'],
     description: 'Получить список заказов',
     method: 'get',
     path: '/',
@@ -44,6 +45,7 @@ export function createOrderRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars
 
   const createOrderRoute = createRoute({
     description: 'Создать заказ',
+    tags: ['Orders'],
     summary: 'Создает заказ',
     method: 'post',
     path: '/',
