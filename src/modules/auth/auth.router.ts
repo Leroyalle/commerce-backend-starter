@@ -38,7 +38,7 @@ export function createAuthRouter(deps: Deps): Hono {
     const result = await deps.commands.verifyEmailCode(body.email, body.code);
     setCookie(c, 'refreshToken', result.refreshToken.token, {
       httpOnly: true,
-      // secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
       expires: result.refreshToken.expAt,
@@ -54,7 +54,7 @@ export function createAuthRouter(deps: Deps): Hono {
     const result = await deps.commands.login(body);
     setCookie(c, 'refreshToken', result.refreshToken.token, {
       httpOnly: true,
-      // secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
       expires: result.refreshToken.expAt,
@@ -99,7 +99,7 @@ export function createAuthRouter(deps: Deps): Hono {
 
       setCookie(c, 'refreshToken', result.refreshToken.token, {
         httpOnly: true,
-        // secure: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/',
         expires: result.refreshToken.expAt,
@@ -152,7 +152,7 @@ export function createAuthRouter(deps: Deps): Hono {
     const result = await deps.commands.refresh(accountId, jti);
     setCookie(c, 'refreshToken', result.refreshToken.token, {
       httpOnly: true,
-      // secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
       expires: result.refreshToken.expAt,
