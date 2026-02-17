@@ -6,6 +6,7 @@ import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
 import { AccountResultActions } from '@/shared/types/auth/link-or-create-account.type';
 
 import { AuthCommands } from './auth.commands';
+import { accessTokenResponseSchema } from './schemas/access-token-response.schema';
 import { loginZodSchema } from './schemas/login.schema';
 import { oauthCallbackZodSchema } from './schemas/oauth-callback.schema';
 import { oauthProviderZodSchema } from './schemas/oauth-provider.schema';
@@ -15,19 +16,6 @@ import {
   verifyEmailCodeZodSchema,
   verifyPasswordCodeZodSchema,
 } from './schemas/verify-code.schema';
-
-const SendCodeResponseSchema = z.object({
-  message: z.string(),
-});
-
-const AccessTokenResponseSchema = z.object({
-  accessToken: z.object({
-    expAt: z.date(),
-    token: z.string(),
-  }),
-});
-
-const LoginByProviderResponseSchema = z.union([SendCodeResponseSchema, AccessTokenResponseSchema]);
 
 interface Deps {
   commands: AuthCommands;
@@ -97,12 +85,8 @@ export function createAuthRouter(
         description: 'Регистрация прошла успешно! Добро пожаловать!',
         content: {
           'application/json': {
-            schema: z.object({
+            schema: accessTokenResponseSchema.extend({
               message: z.string(),
-              accessToken: z.object({
-                token: z.string(),
-                expAt: z.date(),
-              }),
             }),
           },
         },
@@ -146,12 +130,8 @@ export function createAuthRouter(
         description: 'Авторизация прошла успешно!',
         content: {
           'application/json': {
-            schema: z.object({
+            schema: accessTokenResponseSchema.extend({
               message: z.string(),
-              accessToken: z.object({
-                token: z.string(),
-                expAt: z.date(),
-              }),
             }),
           },
         },
@@ -226,7 +206,7 @@ export function createAuthRouter(
         description: 'Успешная авторизация',
         content: {
           'application/json': {
-            schema: LoginByProviderResponseSchema,
+            schema: z.union([z.object({ message: z.string() }), accessTokenResponseSchema]),
           },
         },
       },
@@ -357,13 +337,7 @@ export function createAuthRouter(
         description: 'Токен обновлен!',
         content: {
           'application/json': {
-            schema: z.object({
-              message: z.string(),
-              accessToken: z.object({
-                expAt: z.date(),
-                token: z.string(),
-              }),
-            }),
+            schema: accessTokenResponseSchema.extend({ message: z.string() }),
           },
         },
       },
