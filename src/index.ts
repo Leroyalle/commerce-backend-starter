@@ -22,6 +22,7 @@ app.doc('/openapi.json', {
     version: '1.0.0',
   },
 });
+
 app.get(
   '/docs',
   Scalar({
