@@ -1,8 +1,8 @@
 import { Product } from '@/shared/infrastructure/db/schema/product.schema';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
-import { IPagination } from '@/shared/types/pagination.type';
 
 import { IProductRepository } from './product.repo';
+import { FindProductsQuery } from './schemas/find-products.schema';
 
 interface Deps {
   productRepo: IProductRepository;
@@ -10,7 +10,7 @@ interface Deps {
 
 export interface IProductQueries {
   findAll(
-    pagination?: IPagination,
+    query?: FindProductsQuery,
   ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>>;
   findById(id: string): Promise<Product>;
 }
@@ -18,8 +18,8 @@ export interface IProductQueries {
 export class ProductQueries implements IProductQueries {
   constructor(private readonly deps: Deps) {}
 
-  public findAll(pagination?: IPagination) {
-    return this.deps.productRepo.findAll(pagination);
+  public findAll(query?: FindProductsQuery) {
+    return this.deps.productRepo.findAll(query);
   }
 
   public findById(id: string) {

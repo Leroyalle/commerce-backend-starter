@@ -5,11 +5,11 @@ import { RedisKeyPrefix } from '@/shared/constants/redis-key-prefix.constants';
 import { Product } from '@/shared/infrastructure/db/schema/product.schema';
 import { generateRedisKey } from '@/shared/lib/helpers/generate-redis-key.helper';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
-import { IPagination } from '@/shared/types/pagination.type';
 
 import { IDataCounterQueries } from '../data-counter/data-counter.queries';
 
 import { IProductQueries } from './product.queries';
+import { FindProductsQuery } from './schemas/find-products.schema';
 
 interface Deps {
   redis: Redis;
@@ -22,16 +22,21 @@ export class ProductQueriesCached implements IProductQueries {
   constructor(private readonly deps: Deps) {}
 
   public async findAll(
-    pagination: IPagination,
+    query: FindProductsQuery,
   ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>> {
-    if (pagination.query) {
-      const searchResults = await this.deps.searchIndex.search(pagination.query, {
-        limit: pagination.limit,
+    if (query.query) {
+      const searchResults = await this.deps.searchIndex.search(query.query, {
+        limit: query.limit,
       });
       return { total: searchResults.estimatedTotalHits, items: searchResults.hits };
     }
 
-    const redisKey = generateRedisKey(RedisKeyPrefix.PRODUCT, pagination.page, pagination.limit);
+    const redisKey = generateRedisKey(
+      RedisKeyPrefix.PRODUCT,
+      query.page,
+      query.limit,
+      query?.categoryId ?? '',
+    );
     const cachedProducts = await this.deps.redis.get(redisKey);
 
     if (cachedProducts) {
@@ -40,7 +45,7 @@ export class ProductQueriesCached implements IProductQueries {
       return { total: count, items: products };
     }
 
-    const data = await this.deps.productQueries.findAll(pagination);
+    const data = await this.deps.productQueries.findAll(query);
 
     await this.deps.redis.set(redisKey, JSON.stringify(data.items), 'EX', 60);
     return data;

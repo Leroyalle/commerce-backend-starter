@@ -3,12 +3,12 @@ import { Hono } from 'hono';
 import { Index } from 'meilisearch';
 
 import { Product } from '@/shared/infrastructure/db/schema/product.schema';
-import { paginationZodSchema } from '@/shared/infrastructure/zod/pagination.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 
 import { ProductCommands } from './product.commands';
 import { IProductQueries } from './product.queries';
 import { createProductZodSchema } from './schemas/create-product.schema';
+import { findProductsZodSchema } from './schemas/find-products.schema';
 
 interface Deps {
   commands: ProductCommands;
@@ -19,7 +19,7 @@ interface Deps {
 export function createProductRouter(deps: Deps): Hono {
   const productRouter = new Hono();
 
-  productRouter.get('/', zValidator('query', paginationZodSchema), async c => {
+  productRouter.get('/', zValidator('query', findProductsZodSchema), async c => {
     const query = c.req.valid('query');
     const data = await deps.queries.findAll(query);
     return c.json(data);
