@@ -1,8 +1,10 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
 import { integer, pgTable, uuid } from 'drizzle-orm/pg-core';
 
+import { createSelectSchema } from '../../zod/schema-fabric';
+
 import { Cart, cartSchema } from './cart.schema';
-import { Product, productSchema } from './product.schema';
+import { Product, productSchema, productSelectSchema } from './product.schema';
 
 export const cartItemSchema = pgTable('cartItems', {
   id: uuid().defaultRandom().primaryKey(),
@@ -27,6 +29,9 @@ export const cartItemRelations = relations(cartItemSchema, ({ one }) => ({
 }));
 
 export type CartItem = InferSelectModel<typeof cartItemSchema>;
+export const cartItemSelectSchema = createSelectSchema(cartItemSchema).extend({
+  product: productSelectSchema,
+});
 export type CartItemWithRelations = CartItem & {
   cart: Cart;
   product: Product;
