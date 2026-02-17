@@ -51,7 +51,7 @@ export function accessAuthGuard(
         );
       }
 
-      console.log('error', error);
+      console.log('accessAuthGuard error', error);
       return c.json({ error: 'Unauthorized' }, 401);
     }
   };

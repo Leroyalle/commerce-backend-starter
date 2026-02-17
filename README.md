@@ -1,6 +1,6 @@
 # E-commerce Backend Starter
 
-Репозиторий предназначен для использования как стартовая точка под интернет-магазин.\
+Репозиторий предназначен для использования как стартовая точка под интернет-магазин.  
 Проект предоставляет готовый backend-каркас: пользователи, продукты, заказы, поиск, авторизация (credentials + OAuth), очереди и уведомления.
 
 ---
@@ -12,6 +12,8 @@
 - MeiliSearch
 - Redis
 - BullMQ
+- OpenAPI
+- Scalar (API documentation UI)
 - Docker / Docker Compose
 
 ---
@@ -30,6 +32,9 @@
 - Background jobs (BullMQ)
   - Admin Telegram notifications
   - User Email notifications
+- API documentation
+  - OpenAPI specification
+  - Interactive documentation via Scalar
 
 ---
 
@@ -60,11 +65,4 @@ cp .env.example .env
 bun run db:push
 bun run seed
 bun run dev
-```
-
-### Docker
-
-```bash
-cp .env.example .env
-docker-compose up -d
 ```
