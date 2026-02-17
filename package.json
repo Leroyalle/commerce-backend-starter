@@ -29,6 +29,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
     "@types/bun": "latest",
     "@types/nodemailer": "^7.0.9",
     "@types/pg": "^8.16.0",
@@ -40,7 +42,7 @@
     "tsx": "^4.21.0"
   },
   "lint-staged": {
-    "**/*.{js,ts,tsx}": [
+    "**/*.{js,ts}": [
       "prettier --write",
       "eslint --max-warnings 0"
     ],
