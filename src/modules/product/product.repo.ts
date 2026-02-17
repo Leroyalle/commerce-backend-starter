@@ -14,7 +14,9 @@ export interface IProductRepository {
     aliases: string[];
     categories: string[];
   }): Promise<Product>;
-  findAll(query?: FindProductsQuery): Promise<IPaginationResult<Product>>;
+  findAll(
+    query?: FindProductsQuery,
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>>;
   findById(id: string): Promise<Product>;
 }
 
@@ -37,12 +39,19 @@ export class ProductRepo implements IProductRepository {
     return product;
   }
 
-  public async findAll(query?: FindProductsQuery): Promise<IPaginationResult<Product>> {
+  public async findAll(
+    query?: FindProductsQuery,
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>> {
     const page = query?.page ?? 1;
     const limit = query?.limit ?? 10;
     const categoryId = query?.categoryId;
     const items = await db.query.productSchema.findMany({
       limit,
+      columns: {
+        id: true,
+        name: true,
+        price: true,
+      },
       offset: (page - 1) * limit,
       orderBy: [desc(productSchema.createdAt)],
       where: (product, { exists }) => {

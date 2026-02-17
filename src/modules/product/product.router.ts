@@ -1,8 +1,7 @@
-import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { Index } from 'meilisearch';
 
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product, productSelectSchema } from '@/shared/infrastructure/db/schema/product.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 
 import { ProductCommands } from './product.commands';
@@ -16,23 +15,95 @@ interface Deps {
   searchIndex: Index<Pick<Product, 'id' | 'name' | 'price'>>;
 }
 
-export function createProductRouter(deps: Deps): Hono {
-  const productRouter = new Hono();
+export function createProductRouter(deps: Deps): OpenAPIHono {
+  const productRouter = new OpenAPIHono();
 
-  productRouter.get('/', zValidator('query', findProductsZodSchema), async c => {
+  const getProductsRoute = createRoute({
+    description: 'Получить список продуктов',
+    summary: 'Получить список продуктов',
+    method: 'get',
+    tags: ['Products'],
+    path: '/',
+    request: {
+      query: findProductsZodSchema,
+    },
+    responses: {
+      200: {
+        description: 'Успешный ответ с данными продуктов',
+        content: {
+          'application/json': {
+            schema: z.object({
+              items: productSelectSchema.pick({ id: true, name: true, price: true }).array(),
+              total: z.number(),
+            }),
+          },
+        },
+      },
+    },
+  });
+
+  productRouter.openapi(getProductsRoute, async c => {
     const query = c.req.valid('query');
     const data = await deps.queries.findAll(query);
     return c.json(data);
   });
 
+  const createPostRoute = createRoute({
+    description: 'Создать продукт',
+    tags: ['Products'],
+    summary: 'Создать продукт',
+    method: 'post',
+    path: '/',
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: createProductZodSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Успешный ответ с данными продукта',
+        content: {
+          'application/json': {
+            schema: productSelectSchema,
+          },
+        },
+      },
+    },
+  });
+
   // TODO: гвард на авторизацию админа
-  productRouter.post('/', zValidator('json', createProductZodSchema), async c => {
+  productRouter.openapi(createPostRoute, async c => {
     const body = c.req.valid('json');
     const data = await deps.commands.create(body);
     return c.json(data, 201);
   });
 
-  productRouter.get('/:id', zValidator('param', paramsZodSchema), async c => {
+  const getProductByIdRoute = createRoute({
+    description: 'Получить продукт по id',
+    summary: 'Получить продукт по id',
+    tags: ['Products'],
+    method: 'get',
+    path: '/:id',
+    request: {
+      params: paramsZodSchema,
+    },
+    responses: {
+      200: {
+        description: 'Успешный ответ с данными продукта',
+        content: {
+          'application/json': {
+            schema: productSelectSchema,
+          },
+        },
+      },
+    },
+  });
+
+  productRouter.openapi(getProductByIdRoute, async c => {
     const params = c.req.valid('param');
     const data = await deps.queries.findById(params.id);
     return c.json(data);

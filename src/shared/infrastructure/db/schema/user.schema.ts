@@ -1,6 +1,8 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
+import { createSelectSchema } from '../../zod/schema-fabric';
+
 import { accountSchema } from './account.schema';
 import { cartSchema } from './cart.schema';
 import { orderSchema } from './order.schema';
@@ -21,3 +23,4 @@ export const userRelation = relations(userSchema, ({ many, one }) => ({
 }));
 
 export type User = InferSelectModel<typeof userSchema>;
+export const userSelectSchema = createSelectSchema(userSchema);

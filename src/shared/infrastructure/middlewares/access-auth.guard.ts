@@ -39,7 +39,7 @@ export function accessAuthGuard(
       c.set('role', account.role);
       c.set('accountId', account.id);
 
-      await next();
+      return await next();
     } catch (error: any) {
       if (error?.code === 'ERR_JWT_EXPIRED') {
         return c.json(
@@ -50,6 +50,9 @@ export function accessAuthGuard(
           401,
         );
       }
+
+      console.log('error', error);
+      return c.json({ error: 'Unauthorized' }, 401);
     }
   };
 }
