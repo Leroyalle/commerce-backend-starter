@@ -1,7 +1,8 @@
 import { InferSelectModel, relations } from 'drizzle-orm';
 import { pgTable, uuid } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-zod';
 
-import { cartItemSchema, CartItemWithRelations } from './cart-item.schema';
+import { cartItemSchema, cartItemSelectSchema, CartItemWithRelations } from './cart-item.schema';
 import { userSchema } from './user.schema';
 
 export const cartSchema = pgTable('carts', {
@@ -19,6 +20,10 @@ export const cartRelation = relations(cartSchema, ({ one, many }) => ({
   }),
   cartItems: many(cartItemSchema),
 }));
+
+export const cartSelectSchema = createSelectSchema(cartSchema).extend({
+  cartItems: cartItemSelectSchema.array(),
+});
 
 export type Cart = InferSelectModel<typeof cartSchema>;
 export type CartWithRelations = Cart & { cartItems: Omit<CartItemWithRelations, 'cart'>[] };
