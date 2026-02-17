@@ -19,8 +19,8 @@ export function createCartRouter(deps: Deps): Hono {
   const router = new Hono();
 
   router.get('/', deps.accessAuthMiddleware, async c => {
-    const userId = c.get('userId');
-    const data = await deps.queries.findByUserId(userId);
+    const user = c.get('user');
+    const data = await deps.queries.findByUserId(user.id);
     if (!data) {
       return c.json({ error: 'Cart not found' }, 404);
     }
@@ -32,9 +32,9 @@ export function createCartRouter(deps: Deps): Hono {
     deps.accessAuthMiddleware,
     zValidator('json', addItemZodSchema),
     async c => {
-      const userId = c.get('userId');
+      const user = c.get('user');
       const body = c.req.valid('json');
-      const data = await deps.commands.addItem(userId, body.productId, body.quantity);
+      const data = await deps.commands.addItem(user.id, body.productId, body.quantity);
       return c.json(data);
     },
   );
@@ -45,8 +45,8 @@ export function createCartRouter(deps: Deps): Hono {
     zValidator('param', paramsZodSchema),
     async c => {
       const params = c.req.valid('param');
-      const userId = c.get('userId');
-      const data = await deps.commands.removeItem(userId, params.id);
+      const user = c.get('user');
+      const data = await deps.commands.removeItem(user.id, params.id);
       return c.json(data);
     },
   );
@@ -56,16 +56,16 @@ export function createCartRouter(deps: Deps): Hono {
     deps.accessAuthMiddleware,
     zValidator('param', paramsZodSchema),
     async c => {
-      const userId = c.get('userId');
+      const user = c.get('user');
       const params = c.req.valid('param');
-      const data = await deps.commands.decrementItem(userId, params.id);
+      const data = await deps.commands.decrementItem(user.id, params.id);
       return c.json(data);
     },
   );
 
   router.delete('/', deps.accessAuthMiddleware, async c => {
-    const userId = c.get('userId');
-    const data = await deps.commands.clearCart(userId);
+    const user = c.get('user');
+    const data = await deps.commands.clearCart(user.id);
     return c.json(data);
   });
 
