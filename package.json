@@ -5,7 +5,9 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "drizzle:studio": "drizzle-kit studio",
-    "seed": "bun run src/shared/infrastructure/db/seed.ts"
+    "seed": "bun run src/shared/infrastructure/db/seed.ts",
+    "lint": "eslint .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
@@ -20,12 +22,15 @@
     "hono": "^4.11.7",
     "ioredis": "^5.9.2",
     "jose": "^6.1.3",
+    "lint-staged": "^16.2.7",
     "meilisearch": "^0.55.0",
     "nodemailer": "^8.0.1",
     "pg": "^8.18.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
     "@types/bun": "latest",
     "@types/nodemailer": "^7.0.9",
     "@types/pg": "^8.16.0",
@@ -33,6 +38,16 @@
     "@typescript-eslint/parser": "^8.54.0",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
+    "husky": "^9.1.7",
     "tsx": "^4.21.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts}": [
+      "prettier --write",
+      "eslint --max-warnings 0"
+    ],
+    "**/*.{json,yaml,yml,toml}": [
+      "prettier --write"
+    ]
   }
 }
