@@ -20,8 +20,8 @@ export function createUserRouter(deps: CreateUserRouterDeps): Hono {
   const userRouter = new Hono();
 
   userRouter.get('/me', deps.accessAuthMiddleware, async c => {
-    const id = c.get('userId');
-    const data = await deps.queries.findById(id);
+    const user = c.get('user');
+    const data = await deps.queries.findById(user.id);
     if (!data) throw NotFoundException.User();
     return c.json(data);
   });
