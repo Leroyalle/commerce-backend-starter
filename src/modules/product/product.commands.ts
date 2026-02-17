@@ -15,7 +15,12 @@ interface Deps {
 export class ProductCommands {
   constructor(private readonly deps: Deps) {}
 
-  public async create(data: { name: string; price: number; aliases: string[] }) {
+  public async create(data: {
+    name: string;
+    price: number;
+    aliases: string[];
+    categories: string[];
+  }) {
     const product = await this.deps.productRepo.create(data);
     await this.deps.searchIndex.addDocuments([product]);
     await this.deps.dataCounterCommands.updateCount('increment', 'products');

@@ -6,9 +6,11 @@ import { getEnv } from '../../lib/helpers/get-env.helper';
 import * as accountSchema from './schema/account.schema';
 import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';
+import * as category from './schema/category.schema';
 import * as dataCounterSchema from './schema/data-counter.schema';
 import * as orderSchema from './schema/order.schema';
 import * as productSchema from './schema/product.schema';
+import * as productsToCategories from './schema/products-to-categories.schema';
 import * as refreshTokenSchema from './schema/refresh-token.schema';
 import * as userSchema from './schema/user.schema';
 
@@ -30,6 +32,8 @@ const schema = {
   ...orderSchema,
   ...refreshTokenSchema,
   ...dataCounterSchema,
+  ...category,
+  ...productsToCategories,
 } as const;
 
 export const db = drizzle(client, {

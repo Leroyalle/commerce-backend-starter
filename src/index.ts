@@ -5,6 +5,7 @@ import { createMiddlewares } from './middlewares';
 import { createModules } from './modules';
 import { createAuthRouter } from './modules/auth/auth.router';
 import { createCartRouter } from './modules/cart/cart.router';
+import { createCategoryRouter } from './modules/category/category.router';
 import { createOrderRouter } from './modules/order/order.router';
 import { createProductRouter } from './modules/product/product.router';
 import { createUserRouter } from './modules/user/user.router';
@@ -42,7 +43,7 @@ app.onError((err, c) => {
   );
 });
 
-const { auth, cart, order, product, user, meilisearch } = await createModules();
+const { auth, cart, order, product, user, meilisearch, category } = await createModules();
 
 const { accessGuard, refreshGuard, optionalAccessGuard } = createMiddlewares({
   authCommands: auth.commands,
@@ -69,6 +70,11 @@ const productRouter = createProductRouter({
   searchIndex: meilisearch.indexes.productIndex,
 });
 
+const categoryRouter = createCategoryRouter({
+  commands: category.commands,
+  queries: category.queries,
+});
+
 const cartRouter = createCartRouter({
   commands: cart.commands,
   queries: cart.queries,
@@ -84,6 +90,7 @@ const orderRouter = createOrderRouter({
 app.route('/user', userRouter);
 app.route('/auth', authRouter);
 app.route('/product', productRouter);
+app.route('/category', categoryRouter);
 app.route('/cart', cartRouter);
 app.route('/order', orderRouter);
 
