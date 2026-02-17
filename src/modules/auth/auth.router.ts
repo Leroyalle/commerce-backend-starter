@@ -1,4 +1,4 @@
-import { $, createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import { $, OpenAPIHono } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 
@@ -6,16 +6,16 @@ import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
 import { AccountResultActions } from '@/shared/types/auth/link-or-create-account.type';
 
 import { AuthCommands } from './auth.commands';
-import { accessTokenResponseSchema } from './schemas/access-token-response.schema';
-import { loginZodSchema } from './schemas/login.schema';
-import { oauthCallbackZodSchema } from './schemas/oauth-callback.schema';
-import { oauthProviderZodSchema } from './schemas/oauth-provider.schema';
-import { registerZodSchema } from './schemas/register.schema';
-import { resetPasswordZodSchema } from './schemas/reset-password.schema';
 import {
-  verifyEmailCodeZodSchema,
-  verifyPasswordCodeZodSchema,
-} from './schemas/verify-code.schema';
+  loginByProviderCallbackSchema,
+  loginByProviderRoute,
+  loginRoute,
+  refreshRoute,
+  registerRoute,
+  resetPasswordRoute,
+  verifyEmailRoute,
+  verifyPasswordCodeRoute,
+} from './auth.routes';
 
 interface Deps {
   commands: AuthCommands;
@@ -30,68 +30,10 @@ export function createAuthRouter(
 ): OpenAPIHono<{ Variables: AuthVars & Partial<RefreshAuthVars> }> {
   const authRouter = new OpenAPIHono<{ Variables: AuthVars & Partial<RefreshAuthVars> }>();
 
-  const registerRoute = createRoute({
-    path: '/register',
-    method: 'post',
-    tags: ['Auth'],
-    summary: 'Регистрация',
-    description: 'Регистрация',
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: registerZodSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Код отправлен на ваш email! Не забудьте проверить папку спам',
-        content: {
-          'application/json': {
-            schema: z.object({
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
-  });
-
   authRouter.openapi(registerRoute, async c => {
     const body = c.req.valid('json');
     await deps.commands.register(body);
     return c.json({ message: 'Код отправлен на ваш email! Не забудьте проверить папку спам' }, 201);
-  });
-
-  const verifyEmailRoute = createRoute({
-    path: '/verify-email',
-    tags: ['Auth'],
-    method: 'post',
-    summary: 'Подтверждение email',
-    description: 'Подтверждение email',
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: verifyEmailCodeZodSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Регистрация прошла успешно! Добро пожаловать!',
-        content: {
-          'application/json': {
-            schema: accessTokenResponseSchema.extend({
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
   });
 
   authRouter.openapi(verifyEmailRoute, async c => {
@@ -110,35 +52,6 @@ export function createAuthRouter(
     );
   });
 
-  const loginRoute = createRoute({
-    path: '/login',
-    method: 'post',
-    summary: 'Авторизация',
-    tags: ['Auth'],
-    description: 'Авторизация',
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: loginZodSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Авторизация прошла успешно!',
-        content: {
-          'application/json': {
-            schema: accessTokenResponseSchema.extend({
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
-  });
-
   authRouter.openapi(loginRoute, async c => {
     const body = c.req.valid('json');
     const result = await deps.commands.login(body);
@@ -152,32 +65,6 @@ export function createAuthRouter(
     return c.json({ message: 'Авторизация прошла успешно!', accessToken: result.accessToken }, 201);
   });
 
-  const loginByProviderRoute = createRoute({
-    path: '/login/:provider',
-    tags: ['Auth'],
-    method: 'get',
-    summary: 'Авторизация через провайдер',
-    description: 'Авторизация через провайдер',
-    request: {
-      params: oauthProviderZodSchema,
-    },
-    responses: {
-      302: {
-        description: 'Redirect to OAuth provider',
-        headers: {
-          Location: {
-            schema: {
-              type: 'string',
-            },
-            description: 'URL провайдера для авторизации',
-          },
-        },
-      },
-    },
-  });
-
-  // $(authRouter).use(loginByProviderRoute.path, deps.optionalAccessGuard);
-
   authRouter.openapi(loginByProviderRoute, c => {
     const params = c.req.valid('param');
     const result = deps.commands.oauthLogin(params.provider);
@@ -189,28 +76,6 @@ export function createAuthRouter(
       sameSite: 'Lax',
     });
     return c.redirect(result.url);
-  });
-
-  const loginByProviderCallbackSchema = createRoute({
-    path: '/login/:provider/callback',
-    method: 'get',
-    tags: ['Auth'],
-    summary: 'Авторизация через провайдер',
-    description: 'Авторизация через провайдер',
-    request: {
-      params: oauthProviderZodSchema,
-      query: oauthCallbackZodSchema,
-    },
-    responses: {
-      200: {
-        description: 'Успешная авторизация',
-        content: {
-          'application/json': {
-            schema: z.union([z.object({ message: z.string() }), accessTokenResponseSchema]),
-          },
-        },
-      },
-    },
   });
 
   authRouter.openapi(loginByProviderCallbackSchema, async c => {
@@ -237,35 +102,6 @@ export function createAuthRouter(
     return c.json({ accessToken: result.accessToken }, 200);
   });
 
-  const resetPasswordRoute = createRoute({
-    path: '/reset-password',
-    tags: ['Auth'],
-    method: 'post',
-    summary: 'Сброс пароля',
-    description: 'Сброс пароля',
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: resetPasswordZodSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Письмо с кодом подтверждения отправлено на ваш email',
-        content: {
-          'application/json': {
-            schema: z.object({
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
-  });
-
   $(authRouter).use(resetPasswordRoute.path, deps.accessGuard);
 
   authRouter.openapi(resetPasswordRoute, async c => {
@@ -279,35 +115,6 @@ export function createAuthRouter(
       },
       201,
     );
-  });
-
-  const verifyPasswordCodeRoute = createRoute({
-    path: '/verify-password',
-    method: 'post',
-    tags: ['Auth'],
-    summary: 'Подтверждение сброса пароля',
-    description: 'Подтверждение сброса пароля',
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: verifyPasswordCodeZodSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Пароль успешно изменен!',
-        content: {
-          'application/json': {
-            schema: z.object({
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
   });
 
   $(authRouter).use(verifyPasswordCodeRoute.path, deps.accessGuard);
@@ -324,24 +131,6 @@ export function createAuthRouter(
       },
       201,
     );
-  });
-
-  const refreshRoute = createRoute({
-    path: '/refresh',
-    method: 'post',
-    tags: ['Auth'],
-    summary: 'Обновление токена',
-    description: 'Обновление токена',
-    responses: {
-      201: {
-        description: 'Токен обновлен!',
-        content: {
-          'application/json': {
-            schema: accessTokenResponseSchema.extend({ message: z.string() }),
-          },
-        },
-      },
-    },
   });
 
   $(authRouter).use(refreshRoute.path, deps.refreshGuard);
