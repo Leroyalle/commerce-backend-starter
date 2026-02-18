@@ -1,5 +1,4 @@
 import { MiddlewareHandler } from 'hono';
-import { getCookie } from 'hono/cookie';
 
 import { AuthCommands } from '@/modules/auth/auth.commands';
 import { UserQueries } from '@/modules/user/user.queries';
@@ -10,11 +9,19 @@ export function accessAuthGuard(
   userQueries: UserQueries,
 ): MiddlewareHandler<{ Variables: AuthVars }> {
   return async (c, next): Promise<Response | void> => {
-    const accessToken = getCookie(c, 'accessToken');
+    const authHeader = c.req.header('Authorization');
 
-    if (!accessToken) {
+    if (!authHeader) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
+
+    const [scheme, token] = authHeader.split(' ');
+
+    if (scheme !== 'Bearer' || !token) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const accessToken = token;
 
     try {
       const payload = await authCommands.verifyToken(accessToken, 'access');
