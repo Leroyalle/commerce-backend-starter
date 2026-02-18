@@ -33,7 +33,9 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
         content: {
           'application/json': {
             schema: z.object({
-              items: productSelectSchema.pick({ id: true, name: true, price: true }).array(),
+              items: productSelectSchema
+                .pick({ id: true, name: true, price: true, image: true, details: true })
+                .array(),
               total: z.number(),
             }),
           },
