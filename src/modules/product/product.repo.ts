@@ -12,11 +12,13 @@ export interface IProductRepository {
     name: string;
     price: number;
     aliases: string[];
+    details: Record<string, unknown>;
+    image: string;
     categories: string[];
   }): Promise<Product>;
   findAll(
     query?: FindProductsQuery,
-  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>>;
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>>;
   findById(id: string): Promise<Product>;
 }
 
@@ -24,6 +26,8 @@ export class ProductRepo implements IProductRepository {
   public async create(data: {
     name: string;
     price: number;
+    image: string;
+    details: Record<string, unknown>;
     aliases: string[];
     categories: string[];
   }): Promise<Product> {
@@ -41,7 +45,7 @@ export class ProductRepo implements IProductRepository {
 
   public async findAll(
     query?: FindProductsQuery,
-  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>> {
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>> {
     const page = query?.page ?? 1;
     const limit = query?.limit ?? 10;
     const categoryId = query?.categoryId;
@@ -49,6 +53,8 @@ export class ProductRepo implements IProductRepository {
       limit,
       columns: {
         id: true,
+        image: true,
+        details: true,
         name: true,
         price: true,
       },

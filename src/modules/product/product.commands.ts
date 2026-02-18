@@ -18,6 +18,8 @@ export class ProductCommands {
   public async create(data: {
     name: string;
     price: number;
+    details: Record<string, unknown>;
+    image: string;
     aliases: string[];
     categories: string[];
   }) {

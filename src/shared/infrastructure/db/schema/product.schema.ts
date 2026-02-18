@@ -10,6 +10,7 @@ import { pgTimestamp } from './timestamp';
 export const productSchema = pgTable('products', {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
+  image: text().notNull(),
   price: integer().notNull(),
   details: jsonb().$type<Record<string, unknown>>().default({}),
   aliases: text().array().$type<string[]>().default([]),

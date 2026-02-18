@@ -15,7 +15,7 @@ interface Deps {
   redis: Redis;
   productQueries: IProductQueries;
   dataCounterQueries: IDataCounterQueries;
-  searchIndex: Index<Pick<Product, 'id' | 'name' | 'price'>>;
+  searchIndex: Index<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>;
 }
 
 export class ProductQueriesCached implements IProductQueries {
@@ -23,7 +23,7 @@ export class ProductQueriesCached implements IProductQueries {
 
   public async findAll(
     query: FindProductsQuery,
-  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>> {
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>> {
     if (query.query) {
       const searchResults = await this.deps.searchIndex.search(query.query, {
         limit: query.limit,

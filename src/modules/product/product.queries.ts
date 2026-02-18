@@ -11,7 +11,7 @@ interface Deps {
 export interface IProductQueries {
   findAll(
     query?: FindProductsQuery,
-  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price'>>>;
+  ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>>;
   findById(id: string): Promise<Product>;
 }
 
