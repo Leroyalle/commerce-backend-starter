@@ -37,6 +37,8 @@ async function seed() {
 
     await product.commands.create({
       name,
+      image: faker.image.urlPicsumPhotos(),
+      details: {},
       price: faker.number.int({ min: 1, max: 100_000 }),
       aliases,
       categories: Array.from(randomIds),
