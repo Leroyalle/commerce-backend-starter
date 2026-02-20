@@ -4,6 +4,7 @@ import { ICategoryRepository } from './category.repo';
 
 export interface ICategoryQueries {
   findAll: () => Promise<Category[]>;
+  getById: (id: string) => Promise<Category | undefined>;
 }
 
 interface Deps {
@@ -15,5 +16,9 @@ export class CategoryQueries implements ICategoryQueries {
 
   public async findAll() {
     return await this.deps.repository.getAll();
+  }
+
+  public async getById(id: string) {
+    return await this.deps.repository.getById(id);
   }
 }
