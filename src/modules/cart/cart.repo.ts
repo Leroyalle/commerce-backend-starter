@@ -1,6 +1,7 @@
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
+import { cartItemSchema } from '@/shared/infrastructure/db/schema/cart-item.schema';
 import { Cart, cartSchema, CartWithRelations } from '@/shared/infrastructure/db/schema/cart.schema';
 
 export interface ICartRepository {
@@ -19,6 +20,7 @@ export class CartRepository implements ICartRepository {
           with: {
             product: true,
           },
+          orderBy: [desc(cartItemSchema.createdAt)],
         },
       },
     });

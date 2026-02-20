@@ -4,13 +4,13 @@ import { db } from '@/shared/infrastructure/db/client';
 import { CartItem, cartItemSchema } from '@/shared/infrastructure/db/schema/cart-item.schema';
 
 export interface ICartItemRepository {
-  create: (item: Omit<CartItem, 'id'>) => Promise<CartItem>;
+  create: (item: Omit<CartItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<CartItem>;
   delete: (id: string) => Promise<void>;
   update: (id: string, item: Partial<Omit<CartItem, 'id'>>) => Promise<CartItem>;
 }
 
 export class CartItemRepo implements ICartItemRepository {
-  public async create(item: Omit<CartItem, 'id'>): Promise<CartItem> {
+  public async create(item: Omit<CartItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<CartItem> {
     return (await db.insert(cartItemSchema).values(item).returning())[0];
   }
   public async delete(id: string) {

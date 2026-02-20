@@ -9,7 +9,7 @@ interface Deps {
 export class CartItemCommands {
   constructor(private readonly deps: Deps) {}
 
-  public create(item: Omit<CartItem, 'id'>) {
+  public create(item: Omit<CartItem, 'id' | 'createdAt' | 'updatedAt'>) {
     return this.deps.cartItemRepo.create(item);
   }
 
