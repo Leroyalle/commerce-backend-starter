@@ -5,6 +5,7 @@ import { createSelectSchema } from '../../zod/schema-fabric';
 
 import { Cart, cartSchema } from './cart.schema';
 import { Product, productSchema, productSelectSchema } from './product.schema';
+import { pgTimestamp } from './timestamp';
 
 export const cartItemSchema = pgTable('cartItems', {
   id: uuid().defaultRandom().primaryKey(),
@@ -15,6 +16,7 @@ export const cartItemSchema = pgTable('cartItems', {
     .notNull()
     .references(() => cartSchema.id, { onDelete: 'cascade' }),
   quantity: integer().notNull(),
+  ...pgTimestamp,
 });
 
 export const cartItemRelations = relations(cartItemSchema, ({ one }) => ({
