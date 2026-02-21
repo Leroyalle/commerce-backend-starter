@@ -11,6 +11,10 @@ export class NotFoundException extends DomainException {
     super(`${entity} не найден`);
   }
 
+  public static Category() {
+    return new NotFoundException('Категория');
+  }
+
   public static User() {
     return new NotFoundException('Пользователь');
   }

@@ -1,6 +1,8 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
+import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { categorySelectSchema } from '@/shared/infrastructure/db/schema/category.schema';
+import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
 import { ICategoryCommands } from './category.commands';
@@ -66,6 +68,34 @@ export function createCategoryRouter(deps: Deps) {
     const body = c.req.valid('json');
     const result = await deps.commands.create(body);
     return c.json(result, 201);
+  });
+
+  const getByIdRoute = createRoute({
+    method: 'get',
+    path: '/:id',
+    tags: ['Categories'],
+    summary: 'Получить категорию по id',
+    description: 'Получить категорию по id',
+    request: {
+      params: paramsZodSchema,
+    },
+    responses: {
+      200: {
+        description: 'Возвращает категорию',
+        content: {
+          'application/json': {
+            schema: categorySelectSchema,
+          },
+        },
+      },
+    },
+  });
+
+  router.openapi(getByIdRoute, async c => {
+    const params = c.req.valid('param');
+    const data = await deps.queries.getById(params.id);
+    if (!data) throw NotFoundException.Category();
+    return c.json(data, 200);
   });
 
   return router;

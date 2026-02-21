@@ -40,14 +40,15 @@ export class ProductQueriesCached implements IProductQueries {
     const cachedProducts = await this.deps.redis.get(redisKey);
 
     if (cachedProducts) {
-      const count = await this.deps.dataCounterQueries.getCount('products');
-      const products: Product[] = JSON.parse(cachedProducts);
-      return { total: count, items: products };
+      const products: IPaginationResult<
+        Pick<Product, 'name' | 'id' | 'image' | 'price' | 'details'>
+      > = JSON.parse(cachedProducts);
+      return products;
     }
 
     const data = await this.deps.productQueries.findAll(query);
 
-    await this.deps.redis.set(redisKey, JSON.stringify(data.items), 'EX', 60);
+    await this.deps.redis.set(redisKey, JSON.stringify(data), 'EX', 60);
     return data;
   }
 

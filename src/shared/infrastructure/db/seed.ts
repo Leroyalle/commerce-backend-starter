@@ -27,7 +27,7 @@ async function seed() {
     categories.push(createdCategory);
   }
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     const name = faker.commerce.productName();
     const aliases = [name, name.toLowerCase(), name.replace(/\s+/g, '')];
     const randomIds = new Set([
