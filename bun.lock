@@ -8,7 +8,7 @@
         "@faker-js/faker": "^10.3.0",
         "@hono/zod-openapi": "^1.2.2",
         "@hono/zod-validator": "^0.7.6",
-        "@saintleroyalle/core": "^1.0.2",
+        "@saintleroyalle/core": "^1.2.0",
         "@scalar/hono-api-reference": "^0.9.41",
         "arctic": "^3.7.0",
         "argon2": "^0.44.0",
@@ -222,7 +222,7 @@
 
     "@phc/format": ["@phc/format@1.0.0", "", {}, "sha512-m7X9U6BG2+J+R1lSOdCiITLLrxm+cWlNI3HUFA92oLO77ObGNzaKdh8pMLqdZcshtkKuV84olNNXDfMc4FezBQ=="],
 
-    "@saintleroyalle/core": ["@saintleroyalle/core@1.0.2", "", { "dependencies": { "@trivago/prettier-plugin-sort-imports": "4.2.0" }, "peerDependencies": { "prettier": "3.7.4" } }, "sha512-2UDK0+ou89/5bwDkPmnXuyLUDZ/6nbnDTF2clohhVwj44wK9a4czZmYA4ud0xvp6gw8phmzFy66mMYujUYhHbA=="],
+    "@saintleroyalle/core": ["@saintleroyalle/core@1.2.0", "", { "dependencies": { "@commitlint/cli": "^20.4.1", "@commitlint/config-conventional": "^20.4.1", "@trivago/prettier-plugin-sort-imports": "4.2.0" }, "peerDependencies": { "prettier": "3.7.4" } }, "sha512-Jc05nC3xs+OVgQiEZCgFdCJFB8YcOMJpSkcp8x074ckG+tetz3XF4dRYevW4yHOTxlS0atos3l6n7x1yEBjHWw=="],
 
     "@scalar/core": ["@scalar/core@0.3.38", "", { "dependencies": { "@scalar/types": "0.6.3" } }, "sha512-vacEKCx46szDGKI5x8GrFUQygMMoeOVFxeltkLM1kLylAYs7iLprkwkLlEI0zJezE7mqiWIONh9MDJA2lTciIA=="],
 
