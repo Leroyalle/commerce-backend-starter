@@ -22,9 +22,14 @@ export class DataCounterRepository implements IDataCounterRepository {
   ) {
     const value = type === 'increment' ? 1 : -1;
     await tx
-      .update(dataCounterSchema)
-      .set({ totalCount: sql`${dataCounterSchema.totalCount} + ${value}` })
-      .where(eq(dataCounterSchema.tableName, tableName));
+      .insert(dataCounterSchema)
+      .values({ tableName, totalCount: type === 'increment' ? 1 : 0 })
+      .onConflictDoUpdate({
+        target: dataCounterSchema.tableName,
+        set: {
+          totalCount: sql`GREATEST(${dataCounterSchema.totalCount} + ${value}, 0)`,
+        },
+      });
   }
 
   public async getCount(tableName: string) {
