@@ -135,11 +135,14 @@ export const loginByProviderCallbackSchema = createRoute({
     query: oauthCallbackZodSchema,
   },
   responses: {
-    200: {
-      description: 'Успешная авторизация',
-      content: {
-        'application/json': {
-          schema: z.union([z.object({ message: z.string() }), accessTokenResponseSchema]),
+    302: {
+      description: 'Redirect to OAuth provider',
+      headers: {
+        Location: {
+          schema: {
+            type: 'string',
+          },
+          description: 'URL провайдера для авторизации',
         },
       },
     },

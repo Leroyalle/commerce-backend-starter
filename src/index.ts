@@ -13,6 +13,7 @@ import { createUserRouter } from './modules/user/user.router';
 import { SECURITY_SCHEMES } from './shared/constants/security-schemes.constants';
 import { ERROR_HTTP_STATUS } from './shared/exceptions/error-status-map';
 import { resolveErrorCode } from './shared/exceptions/resolve-error-code';
+import { getEnv } from './shared/lib/helpers/get-env.helper';
 
 const app = new OpenAPIHono().basePath('/api');
 
@@ -54,7 +55,7 @@ app.get(
 app.use(
   '*',
   cors({
-    origin: 'http://localhost:5173',
+    origin: [getEnv('FRONTEND_URL')],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     // allowHeaders: ['Content-Type', 'Authorization'],
     // exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
