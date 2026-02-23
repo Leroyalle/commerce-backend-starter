@@ -2,6 +2,7 @@ import { $, OpenAPIHono } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 
+import { getEnv } from '@/shared/lib/helpers/get-env.helper';
 import { AuthVars, RefreshAuthVars } from '@/shared/types/auth-variables.type';
 import { AccountResultActions } from '@/shared/types/auth/link-or-create-account.type';
 
@@ -99,7 +100,7 @@ export function createAuthRouter(
       expires: result.refreshToken.expAt,
     });
 
-    return c.json({ accessToken: result.accessToken }, 200);
+    return c.redirect(getEnv('FRONTEND_URL'));
   });
 
   $(authRouter).use(resetPasswordRoute.path, deps.accessGuard);
