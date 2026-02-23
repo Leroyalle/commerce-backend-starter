@@ -4,7 +4,7 @@ import { integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from '../../zod/schema-fabric';
 
 import { cartItemSchema } from './cart-item.schema';
-import { favoritesSchema } from './favorites.schema';
+import { favoriteSchema } from './favorite.schema';
 import { productsToCategoriesSchema } from './products-to-categories.schema';
 import { pgTimestamp } from './timestamp';
 
@@ -21,7 +21,7 @@ export const productSchema = pgTable('products', {
 export const productRelations = relations(productSchema, ({ many }) => ({
   cartItems: many(cartItemSchema),
   productsToCategories: many(productsToCategoriesSchema),
-  favorites: many(favoritesSchema),
+  favorites: many(favoriteSchema),
 }));
 
 export const productSelectSchema = createSelectSchema(productSchema);

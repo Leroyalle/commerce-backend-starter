@@ -8,6 +8,7 @@ import * as cartItemSchema from './schema/cart-item.schema';
 import * as cartSchema from './schema/cart.schema';
 import * as category from './schema/category.schema';
 import * as dataCounterSchema from './schema/data-counter.schema';
+import * as favoriteSchema from './schema/favorite.schema';
 import * as orderSchema from './schema/order.schema';
 import * as productSchema from './schema/product.schema';
 import * as productsToCategories from './schema/products-to-categories.schema';
@@ -34,6 +35,7 @@ const schema = {
   ...dataCounterSchema,
   ...category,
   ...productsToCategories,
+  ...favoriteSchema,
 } as const;
 
 export const db = drizzle(client, {

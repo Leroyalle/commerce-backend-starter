@@ -5,7 +5,7 @@ import { createSelectSchema } from '../../zod/schema-fabric';
 
 import { accountSchema } from './account.schema';
 import { cartSchema } from './cart.schema';
-import { favoritesSchema } from './favorites.schema';
+import { favoriteSchema } from './favorite.schema';
 import { orderSchema } from './order.schema';
 import { pgTimestamp } from './timestamp';
 
@@ -21,7 +21,7 @@ export const userRelation = relations(userSchema, ({ many, one }) => ({
   accounts: many(accountSchema),
   cart: one(cartSchema),
   orders: many(orderSchema),
-  favorites: many(favoritesSchema),
+  favorites: many(favoriteSchema),
 }));
 
 export type User = InferSelectModel<typeof userSchema>;

@@ -5,7 +5,7 @@ import { productSchema } from './product.schema';
 import { pgTimestamp } from './timestamp';
 import { userSchema } from './user.schema';
 
-export const favoritesSchema = pgTable(
+export const favoriteSchema = pgTable(
   'favorites',
   {
     productId: uuid().references(() => productSchema.id),
@@ -19,15 +19,15 @@ export const favoritesSchema = pgTable(
   }),
 );
 
-export const favoritesRelations = relations(favoritesSchema, ({ one }) => ({
+export const favoriteRelations = relations(favoriteSchema, ({ one }) => ({
   product: one(productSchema, {
-    fields: [favoritesSchema.productId],
+    fields: [favoriteSchema.productId],
     references: [productSchema.id],
   }),
   user: one(userSchema, {
-    fields: [favoritesSchema.userId],
+    fields: [favoriteSchema.userId],
     references: [userSchema.id],
   }),
 }));
 
-export type Favorite = InferSelectModel<typeof favoritesSchema>;
+export type Favorite = InferSelectModel<typeof favoriteSchema>;
