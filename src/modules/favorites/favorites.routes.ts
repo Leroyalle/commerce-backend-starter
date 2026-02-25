@@ -32,3 +32,22 @@ export const addFavoriteRoute = createRoute({
     },
   },
 });
+
+export const findFavoritesRoute = createRoute({
+  summary: 'Поиск избранных товаров',
+  tags: ['Favorites'],
+  description: 'Поиск избранных товаров',
+  method: 'get',
+  path: '/favorites',
+  security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
+  responses: {
+    200: {
+      description: 'Возвращает список избранных товаров',
+      content: {
+        'application/json': {
+          schema: favoritesSelectSchema.array(),
+        },
+      },
+    },
+  },
+});

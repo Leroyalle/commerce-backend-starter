@@ -5,7 +5,7 @@ import type { AuthVars } from '@/shared/types/auth-variables.type';
 
 import type { IFavoritesCommands } from './favorites.commands';
 import type { IFavoritesQueries } from './favorites.queries';
-import { addFavoriteRoute } from './favorites.routes';
+import { addFavoriteRoute, findFavoritesRoute } from './favorites.routes';
 
 interface Deps {
   accessAuthMiddleware: MiddlewareHandler<{ Variables: AuthVars }>;
@@ -21,8 +21,14 @@ export function createFavoritesRouter(deps: Deps) {
     const { productId } = c.req.valid('json');
     const user = c.get('user');
     const result = await deps.favoritesCommands.add({ productId, userId: user.id });
-
     return c.json(result, 201);
+  });
+
+  $(router).use(findFavoritesRoute.path, deps.accessAuthMiddleware);
+  router.openapi(findFavoritesRoute, async c => {
+    const user = c.get('user');
+    const data = await deps.favoritesQueries.findAllByUserId(user.id);
+    return c.json(data, 200);
   });
 
   return router;
