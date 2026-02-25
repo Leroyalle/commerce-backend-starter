@@ -2,6 +2,7 @@ import { createAuthModule } from './modules/auth/auth.module';
 import { createCartModule } from './modules/cart/cart.module';
 import { createCategoryModule } from './modules/category/category.module';
 import { createDataCounterModule } from './modules/data-counter/data-counter.module';
+import { createFavoritesModule } from './modules/favorites/favorites.module';
 import { createMailerModule } from './modules/mailer/mailer.module';
 import { createMeilisearchModule } from './modules/meilisearch/meilisearch.module';
 import { createOrderModule } from './modules/order/order.module';
@@ -14,6 +15,8 @@ import { redis } from './shared/infrastructure/redis/client';
 
 export async function createModules() {
   const meilisearch = await createMeilisearchModule();
+
+  const favorites = createFavoritesModule({ db });
 
   const notificationProducer = new NotificationProducer(redis);
 
@@ -57,6 +60,7 @@ export async function createModules() {
     order,
     telegram,
     dataCounter,
+    favorites,
     meilisearch,
     mailer,
   };
