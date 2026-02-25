@@ -1,6 +1,8 @@
 import { type InferSelectModel, relations } from 'drizzle-orm';
 import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core';
 
+import { createSelectSchema } from '../../zod/schema-fabric';
+
 import { productSchema } from './product.schema';
 import { pgTimestamp } from './timestamp';
 import { userSchema } from './user.schema';
@@ -31,3 +33,5 @@ export const favoriteRelations = relations(favoriteSchema, ({ one }) => ({
 }));
 
 export type Favorite = InferSelectModel<typeof favoriteSchema>;
+
+export const favoritesSelectSchema = createSelectSchema(favoriteSchema);
