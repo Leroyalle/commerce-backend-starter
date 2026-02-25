@@ -51,3 +51,33 @@ export const findFavoritesRoute = createRoute({
     },
   },
 });
+
+export const removeFavoriteRoute = createRoute({
+  summary: 'Удалить товар из избранного',
+  tags: ['Favorites'],
+  description: 'Удалить товар из избранного',
+  method: 'delete',
+  path: '/favorites',
+  security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            productId: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Товар удален',
+      content: {
+        'application/json': {
+          schema: favoritesSelectSchema,
+        },
+      },
+    },
+  },
+});
