@@ -10,8 +10,12 @@ import { userSchema } from './user.schema';
 export const favoriteSchema = pgTable(
   'favorites',
   {
-    productId: uuid().references(() => productSchema.id),
-    userId: uuid().references(() => userSchema.id),
+    productId: uuid()
+      .references(() => productSchema.id)
+      .notNull(),
+    userId: uuid()
+      .references(() => userSchema.id)
+      .notNull(),
     ...pgTimestamp,
   },
   table => ({

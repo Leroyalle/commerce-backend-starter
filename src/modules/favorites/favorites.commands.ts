@@ -14,7 +14,7 @@ interface Deps {
 export class FavoritesCommands implements IFavoritesCommands {
   constructor(private readonly deps: Deps) {}
 
-  public async add(data: Omit<Favorite, 'createdAt' | 'updatedAt'>): Promise<Favorite> {
+  public async add(data: { userId: string; productId: string }): Promise<Favorite> {
     return this.deps.favoritesRepo.create(data);
   }
 
