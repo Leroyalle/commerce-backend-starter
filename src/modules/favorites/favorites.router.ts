@@ -1,7 +1,10 @@
 import { $, OpenAPIHono } from '@hono/zod-openapi';
 import type { MiddlewareHandler } from 'hono';
 
+import { NotFoundException } from '@/shared/exceptions/exceptions';
 import type { AuthVars } from '@/shared/types/auth-variables.type';
+
+import type { IProductQueries } from '../product/product.queries';
 
 import type { IFavoritesCommands } from './favorites.commands';
 import type { IFavoritesQueries } from './favorites.queries';
@@ -11,6 +14,7 @@ interface Deps {
   accessAuthMiddleware: MiddlewareHandler<{ Variables: AuthVars }>;
   favoritesCommands: IFavoritesCommands;
   favoritesQueries: IFavoritesQueries;
+  productQueries: IProductQueries;
 }
 
 export function createFavoritesRouter(deps: Deps) {
@@ -27,8 +31,12 @@ export function createFavoritesRouter(deps: Deps) {
   $(router).use(findFavoritesRoute.path, deps.accessAuthMiddleware);
   router.openapi(findFavoritesRoute, async c => {
     const user = c.get('user');
-    const data = await deps.favoritesQueries.findAllByUserId(user.id);
-    return c.json(data, 200);
+    const favorites = await deps.favoritesQueries.findAllByUserId(user.id);
+    const favoriteIds = favorites
+      .map(favorite => favorite.productId)
+      .filter((id): id is string => !!id);
+    const products = await deps.productQueries.findByIds(favoriteIds);
+    return c.json(products, 200);
   });
 
   $(router).use(removeFavoriteRoute.path, deps.accessAuthMiddleware);
@@ -36,6 +44,7 @@ export function createFavoritesRouter(deps: Deps) {
     const { productId } = c.req.valid('json');
     const user = c.get('user');
     const result = await deps.favoritesCommands.remove({ productId, userId: user.id });
+    if (!result) throw NotFoundException.Favorite();
     return c.json(result, 201);
   });
 
