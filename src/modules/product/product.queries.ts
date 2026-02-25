@@ -13,6 +13,7 @@ export interface IProductQueries {
     query?: FindProductsQuery,
   ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>>;
   findById(id: string): Promise<Product>;
+  findByIds(ids: string[]): Promise<Product[]>;
 }
 
 export class ProductQueries implements IProductQueries {
@@ -24,5 +25,9 @@ export class ProductQueries implements IProductQueries {
 
   public findById(id: string) {
     return this.deps.productRepo.findById(id);
+  }
+
+  public findByIds(ids: string[]) {
+    return this.deps.productRepo.findByIds(ids);
   }
 }

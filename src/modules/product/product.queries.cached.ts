@@ -55,4 +55,8 @@ export class ProductQueriesCached implements IProductQueries {
   public async findById(id: string): Promise<Product> {
     return this.deps.productQueries.findById(id);
   }
+
+  public async findByIds(ids: string[]): Promise<Product[]> {
+    return this.deps.productQueries.findByIds(ids);
+  }
 }

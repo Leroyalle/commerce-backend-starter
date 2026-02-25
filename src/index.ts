@@ -107,6 +107,7 @@ const favoritesRouter = createFavoritesRouter({
   accessAuthMiddleware: accessGuard,
   favoritesCommands: favorites.commands,
   favoritesQueries: favorites.queries,
+  productQueries: product.queries,
 });
 
 const productRouter = createProductRouter({
