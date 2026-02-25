@@ -1,4 +1,4 @@
-import { and, count, desc, eq, exists, SQL } from 'drizzle-orm';
+import { and, count, desc, eq, exists, inArray, SQL } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
 import { Product, productSchema } from '@/shared/infrastructure/db/schema/product.schema';
@@ -20,6 +20,7 @@ export interface IProductRepository {
     query?: FindProductsQuery,
   ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>>;
   findById(id: string): Promise<Product>;
+  findByIds(ids: string[]): Promise<Product[]>;
 }
 
 export class ProductRepo implements IProductRepository {
@@ -109,5 +110,9 @@ export class ProductRepo implements IProductRepository {
 
   public async findById(id: string): Promise<Product> {
     return (await db.select().from(productSchema).where(eq(productSchema.id, id)))[0];
+  }
+
+  public findByIds(ids: string[]) {
+    return db.select().from(productSchema).where(inArray(productSchema.id, ids));
   }
 }

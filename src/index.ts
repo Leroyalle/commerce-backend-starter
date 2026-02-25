@@ -7,6 +7,7 @@ import { createModules } from './modules';
 import { createAuthRouter } from './modules/auth/auth.router';
 import { createCartRouter } from './modules/cart/cart.router';
 import { createCategoryRouter } from './modules/category/category.router';
+import { createFavoritesRouter } from './modules/favorites/favorites.router';
 import { createOrderRouter } from './modules/order/order.router';
 import { createProductRouter } from './modules/product/product.router';
 import { createUserRouter } from './modules/user/user.router';
@@ -58,7 +59,6 @@ app.use(
     origin: [getEnv('FRONTEND_URL')],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     // allowHeaders: ['Content-Type', 'Authorization'],
-    // exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
     maxAge: 600,
     credentials: true,
   }),
@@ -81,7 +81,8 @@ app.onError((err, c) => {
   );
 });
 
-const { auth, cart, order, product, user, meilisearch, category } = await createModules();
+const { auth, cart, order, product, user, meilisearch, category, favorites } =
+  await createModules();
 
 const { accessGuard, refreshGuard, optionalAccessGuard } = createMiddlewares({
   authCommands: auth.commands,
@@ -100,6 +101,13 @@ const authRouter = createAuthRouter({
   refreshGuard,
   accessGuard,
   optionalAccessGuard,
+});
+
+const favoritesRouter = createFavoritesRouter({
+  accessAuthMiddleware: accessGuard,
+  favoritesCommands: favorites.commands,
+  favoritesQueries: favorites.queries,
+  productQueries: product.queries,
 });
 
 const productRouter = createProductRouter({
@@ -128,6 +136,7 @@ const orderRouter = createOrderRouter({
 app.route('/user', userRouter);
 app.route('/auth', authRouter);
 app.route('/product', productRouter);
+app.route('/favorites', favoritesRouter);
 app.route('/category', categoryRouter);
 app.route('/cart', cartRouter);
 app.route('/order', orderRouter);

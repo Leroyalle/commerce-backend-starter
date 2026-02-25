@@ -11,6 +11,10 @@ export class NotFoundException extends DomainException {
     super(`${entity} не найден`);
   }
 
+  public static Favorite() {
+    return new NotFoundException('Товар в избранном');
+  }
+
   public static Category() {
     return new NotFoundException('Категория');
   }
