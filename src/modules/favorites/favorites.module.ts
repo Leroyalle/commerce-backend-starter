@@ -2,8 +2,8 @@ import type { DB } from '@/shared/infrastructure/db/client';
 import type { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
 import { FavoritesCommands, type IFavoritesCommands } from './favorites.commands';
+import { FavoritesQueries, type IFavoritesQueries } from './favorites.queries';
 import { FavoritesRepo } from './favorites.repo';
-import { FavoritesQueries, type IFavoritesQueries } from './favourites.queries';
 
 interface Deps {
   db: DB;
