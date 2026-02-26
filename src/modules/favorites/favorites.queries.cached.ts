@@ -15,7 +15,6 @@ export class FavoritesQueriesCached implements IFavoritesQueries {
   public async findAllByUserId(userId: string): Promise<string[]> {
     const key = `user:${userId}:favorites`;
     const cachedUserFavorites = await this.deps.redis.smembers(key);
-    console.log(cachedUserFavorites);
     if (cachedUserFavorites.length) return cachedUserFavorites;
     const favoriteIds = await this.deps.favoritesQueries.findAllByUserId(userId);
     await this.deps.redis.sadd(key, favoriteIds);
