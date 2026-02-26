@@ -31,12 +31,15 @@ async function seed() {
   for (let i = 0; i < 100; i++) {
     const name = faker.commerce.productName();
     const aliases = [name, name.toLowerCase(), name.replace(/\s+/g, '')];
+    const description = faker.commerce.productDescription();
+
     const randomIds = new Set([
       categories[Math.floor(Math.random() * 10)].id,
       categories[Math.floor(Math.random() * 10)].id,
     ]);
 
     await product.commands.create({
+      description,
       name,
       image: faker.image.urlPicsumPhotos(),
       details: {},

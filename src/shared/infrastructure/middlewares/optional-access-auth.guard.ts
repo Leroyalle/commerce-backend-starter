@@ -23,7 +23,6 @@ export function optionalAccessAuthGuard(
 
     try {
       const payload = await authCommands.verifyToken(token, 'access');
-
       if (!payload.payload.sub) {
         return await next();
       }
