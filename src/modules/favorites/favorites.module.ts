@@ -7,7 +7,7 @@ import { FavoritesCommands, type IFavoritesCommands } from './favorites.commands
 import { FavoritesQueries, type IFavoritesQueries } from './favorites.queries';
 import { FavoritesQueriesCached } from './favorites.queries.cached';
 import { FavoritesRepo } from './favorites.repo';
-import { FavoritesService } from './favorites.service';
+import { FavoritesService, type IFavoritesService } from './favorites.service';
 
 interface Deps {
   db: DB;
@@ -16,7 +16,7 @@ interface Deps {
 
 export function createFavoritesModule(
   deps: Deps,
-): CreateModuleResult<IFavoritesCommands, IFavoritesQueries> {
+): CreateModuleResult<IFavoritesCommands, IFavoritesQueries, IFavoritesService> {
   const repository = new FavoritesRepo({ db: deps.db });
   const commands = new FavoritesCommands({ favoritesRepo: repository, redis: deps.redis });
   const service = new FavoritesService();
@@ -27,5 +27,5 @@ export function createFavoritesModule(
     redis: deps.redis,
   });
 
-  return { commands, queries: cachedQueries };
+  return { commands, queries: cachedQueries, services: service };
 }

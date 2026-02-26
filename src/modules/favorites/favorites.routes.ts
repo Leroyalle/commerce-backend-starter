@@ -13,6 +13,7 @@ export const addFavoriteRoute = createRoute({
   security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
   request: {
     body: {
+      required: true,
       content: {
         'application/json': {
           schema: z.object({
@@ -46,7 +47,11 @@ export const findFavoritesRoute = createRoute({
       description: 'Возвращает список избранных товаров',
       content: {
         'application/json': {
-          schema: productSelectSchema.array(),
+          schema: productSelectSchema
+            .extend({
+              isFavorite: z.boolean(),
+            })
+            .array(),
         },
       },
     },
@@ -58,18 +63,12 @@ export const removeFavoriteRoute = createRoute({
   tags: ['Favorites'],
   description: 'Удалить товар из избранного',
   method: 'delete',
-  path: '/',
+  path: '/:productId',
   security: [{ [SECURITY_SCHEMES.ACCESS_TOKEN_COOKIE]: [] }],
   request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: z.object({
-            productId: z.uuid(),
-          }),
-        },
-      },
-    },
+    params: z.object({
+      productId: z.uuid(),
+    }),
   },
   responses: {
     201: {
