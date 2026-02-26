@@ -108,6 +108,7 @@ const favoritesRouter = createFavoritesRouter({
   favoritesCommands: favorites.commands,
   favoritesQueries: favorites.queries,
   productQueries: product.queries,
+  favoritesService: favorites.services,
 });
 
 const productRouter = createProductRouter({
