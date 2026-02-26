@@ -114,6 +114,8 @@ const productRouter = createProductRouter({
   commands: product.commands,
   queries: product.queries,
   searchIndex: meilisearch.indexes.productIndex,
+  favoritesQueries: favorites.queries,
+  optionalAccessGuard,
 });
 
 const categoryRouter = createCategoryRouter({

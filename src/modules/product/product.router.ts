@@ -1,8 +1,12 @@
-import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import { $, createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
+import type { MiddlewareHandler } from 'hono';
 import { Index } from 'meilisearch';
 
 import { Product, productSelectSchema } from '@/shared/infrastructure/db/schema/product.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
+import type { AuthVars } from '@/shared/types/auth-variables.type';
+
+import type { IFavoritesQueries } from '../favorites/favorites.queries';
 
 import { ProductCommands } from './product.commands';
 import { IProductQueries } from './product.queries';
@@ -13,10 +17,12 @@ interface Deps {
   commands: ProductCommands;
   queries: IProductQueries;
   searchIndex: Index<Pick<Product, 'id' | 'name' | 'price'>>;
+  favoritesQueries: IFavoritesQueries;
+  optionalAccessGuard: MiddlewareHandler<{ Variables: Partial<AuthVars> }>;
 }
 
-export function createProductRouter(deps: Deps): OpenAPIHono {
-  const productRouter = new OpenAPIHono();
+export function createProductRouter(deps: Deps): OpenAPIHono<{ Variables: Partial<AuthVars> }> {
+  const productRouter = new OpenAPIHono<{ Variables: Partial<AuthVars> }>();
 
   const getProductsRoute = createRoute({
     description: 'Получить список продуктов',
@@ -35,6 +41,9 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
             schema: z.object({
               items: productSelectSchema
                 .pick({ id: true, name: true, price: true, image: true, details: true })
+                .extend({
+                  isFavorite: z.boolean(),
+                })
                 .array(),
               total: z.number(),
             }),
@@ -44,10 +53,19 @@ export function createProductRouter(deps: Deps): OpenAPIHono {
     },
   });
 
+  $(productRouter).use(getProductsRoute.path, deps.optionalAccessGuard);
   productRouter.openapi(getProductsRoute, async c => {
     const query = c.req.valid('query');
+    const user = c.get('user');
+    const userFavoriteIds = new Set(
+      user ? await deps.favoritesQueries.findAllByUserId(user.id) : [],
+    );
     const data = await deps.queries.findAll(query);
-    return c.json(data);
+    const result = data.items.map(item => ({
+      ...item,
+      isFavorite: userFavoriteIds.has(item.id),
+    }));
+    return c.json({ items: result, total: data.total }, 200);
   });
 
   const createPostRoute = createRoute({

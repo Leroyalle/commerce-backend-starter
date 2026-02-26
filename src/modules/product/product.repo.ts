@@ -50,6 +50,18 @@ export class ProductRepo implements IProductRepository {
     const page = query?.page ?? 1;
     const limit = query?.limit ?? 10;
     const categoryId = query?.categoryId;
+
+    // const isFavoriteExpr = userId
+    //   ? sql<boolean>`
+    //   EXISTS (
+    //     SELECT 1
+    //     FROM ${favoriteSchema}
+    //     WHERE ${favoriteSchema.productId} = ${productSchema.id}
+    //     AND ${favoriteSchema.userId} = ${userId}
+    //   )
+    // `
+    //   : sql<boolean>`false`;
+
     const items = await db.query.productSchema.findMany({
       limit,
       columns: {
@@ -61,6 +73,11 @@ export class ProductRepo implements IProductRepository {
       },
       offset: (page - 1) * limit,
       orderBy: [desc(productSchema.createdAt)],
+
+      // extras: {
+      //   isFavorite: isFavoriteExpr.as('isFavorite'),
+      // },
+
       where: (product, { exists }) => {
         const conditions: SQL[] = [];
 
