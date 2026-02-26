@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
+import type { CartCommands } from '../cart/cart.commands';
 import { CartQueries } from '../cart/cart.queries';
 import { UserQueries } from '../user/user.queries';
 
@@ -12,6 +13,7 @@ import { OrderRepo } from './order.repo';
 
 interface Deps {
   cartQueries: CartQueries;
+  cartCommands: CartCommands;
   userQueries: UserQueries;
   redis: Redis;
   notificationProducer: INotificationProducer;
@@ -24,6 +26,7 @@ export function createOrderModule(deps: Deps): CreateModuleResult<OrderCommands,
   const commands = new OrderCommands({
     orderRepo: repository,
     cartQueries: deps.cartQueries,
+    cartCommands: deps.cartCommands,
     userQueries: deps.userQueries,
     notificationProducer: deps.notificationProducer,
   });

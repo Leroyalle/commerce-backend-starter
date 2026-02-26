@@ -35,6 +35,19 @@ export function createConsumer(deps: Deps) {
           };
           return await deps.service.send(payload);
         }
+
+        case 'order_confirmed_email': {
+          const data = job.data as Extract<
+            TMailQueuePayload,
+            { name: 'order_confirmed_email' }
+          >['data'];
+          const payload: ISendEmailPayload = {
+            to: data.email,
+            subject: 'Подтверждение заказа',
+            text: `🛍️ Ваш заказ подтвержден! Номер заказа - ${data.orderId}`,
+          };
+          return await deps.service.send(payload);
+        }
         default:
           throw new Error(`Job ${job.name} is not handled in Auth Worker`);
       }
