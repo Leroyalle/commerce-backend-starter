@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
-import { AccountWithRelations } from '@/shared/infrastructure/db/schema/account.schema';
+import { AccountWithRelations } from '@/shared/infrastructure/db/schemes/account.schema';
 
-import { User, userSchema } from '../../shared/infrastructure/db/schema/user.schema';
+import { User, userSchema } from '../../shared/infrastructure/db/schemes/user.schema';
 
 export interface IUserRepository {
   findById(id: string): Promise<User | undefined>;

@@ -2,7 +2,7 @@ import { $, createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 
 import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
-import { cartSelectSchema } from '@/shared/infrastructure/db/schema/cart.schema';
+import { cartSelectSchema } from '@/shared/infrastructure/db/schemes/cart.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
 import { paramsZodSchema } from '../../shared/infrastructure/zod/params.schema';

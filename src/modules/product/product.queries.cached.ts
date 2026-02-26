@@ -2,7 +2,7 @@ import Redis from 'ioredis';
 import { Index } from 'meilisearch';
 
 import { RedisKeyPrefix } from '@/shared/constants/redis-key-prefix.constants';
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product } from '@/shared/infrastructure/db/schemes/product.schema';
 import { generateRedisKey } from '@/shared/lib/helpers/generate-redis-key.helper';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 

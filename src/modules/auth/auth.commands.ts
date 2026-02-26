@@ -11,7 +11,7 @@ import {
   UserNotVerifiedException,
 } from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
-import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { User } from '@/shared/infrastructure/db/schemes/user.schema';
 import { isGithubResponse } from '@/shared/lib/guards/is-github-response.guard';
 import { isYandexResponse } from '@/shared/lib/guards/is-yandex-response.guard';
 import { SuccessAuthResult } from '@/shared/types/auth-result.type';

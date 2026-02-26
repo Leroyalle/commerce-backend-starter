@@ -3,17 +3,17 @@ import { Pool } from 'pg';
 
 import { getEnv } from '../../lib/helpers/get-env.helper';
 
-import * as accountSchema from './schema/account.schema';
-import * as cartItemSchema from './schema/cart-item.schema';
-import * as cartSchema from './schema/cart.schema';
-import * as category from './schema/category.schema';
-import * as dataCounterSchema from './schema/data-counter.schema';
-import * as favoriteSchema from './schema/favorite.schema';
-import * as orderSchema from './schema/order.schema';
-import * as productSchema from './schema/product.schema';
-import * as productsToCategories from './schema/products-to-categories.schema';
-import * as refreshTokenSchema from './schema/refresh-token.schema';
-import * as userSchema from './schema/user.schema';
+import * as accountSchema from './schemes/account.schema';
+import * as cartItemSchema from './schemes/cart-item.schema';
+import * as cartSchema from './schemes/cart.schema';
+import * as category from './schemes/category.schema';
+import * as dataCounterSchema from './schemes/data-counter.schema';
+import * as favoriteSchema from './schemes/favorite.schema';
+import * as orderSchema from './schemes/order.schema';
+import * as productSchema from './schemes/product.schema';
+import * as productsToCategories from './schemes/products-to-categories.schema';
+import * as refreshTokenSchema from './schemes/refresh-token.schema';
+import * as userSchema from './schemes/user.schema';
 
 const client = new Pool({
   host: getEnv('DB_HOST'),

@@ -1,4 +1,4 @@
-import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { User } from '@/shared/infrastructure/db/schemes/user.schema';
 
 import { IUserRepository } from './user.repo';
 

@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
 import { DB } from '@/shared/infrastructure/db/client';
-import { Category, categorySchema } from '@/shared/infrastructure/db/schema/category.schema';
+import { Category, categorySchema } from '@/shared/infrastructure/db/schemes/category.schema';
 
 export interface ICategoryRepository {
   getAll: () => Promise<Category[]>;

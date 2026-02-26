@@ -2,7 +2,7 @@ import { $, createRoute, OpenAPIHono } from '@hono/zod-openapi';
 import { MiddlewareHandler } from 'hono';
 
 import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
-import { orderSelectScheme } from '@/shared/infrastructure/db/schema/order.schema';
+import { orderSelectScheme } from '@/shared/infrastructure/db/schemes/order.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 
 import { OrderCommands } from './order.commands';

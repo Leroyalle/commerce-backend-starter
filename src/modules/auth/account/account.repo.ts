@@ -7,7 +7,7 @@ import {
   AccountWithRelations,
   credentialsAccountSchema,
   oauthAccountSchema,
-} from '@/shared/infrastructure/db/schema/account.schema';
+} from '@/shared/infrastructure/db/schemes/account.schema';
 import { ICreateAccount, IUpdateAccount } from '@/shared/types/auth/create-account.type';
 
 import { ProviderName } from '../constants/providers-map.constant';

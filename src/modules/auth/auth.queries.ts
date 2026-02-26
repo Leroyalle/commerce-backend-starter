@@ -1,5 +1,5 @@
-import { Account } from '@/shared/infrastructure/db/schema/account.schema';
-import { RefreshToken } from '@/shared/infrastructure/db/schema/refresh-token.schema';
+import { Account } from '@/shared/infrastructure/db/schemes/account.schema';
+import { RefreshToken } from '@/shared/infrastructure/db/schemes/refresh-token.schema';
 
 import { IAccountQueries } from './account/account.queries';
 import { ITokenQueries } from './token/token.queries';

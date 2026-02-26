@@ -1,6 +1,6 @@
 import { Index } from 'meilisearch';
 
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product } from '@/shared/infrastructure/db/schemes/product.schema';
 
 import { IDataCounterCommands } from '../data-counter/data-counter.commands';
 

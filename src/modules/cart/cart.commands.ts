@@ -1,5 +1,5 @@
 import { CartCreationFailedException, NotFoundException } from '@/shared/exceptions/exceptions';
-import { Cart } from '@/shared/infrastructure/db/schema/cart.schema';
+import { Cart } from '@/shared/infrastructure/db/schemes/cart.schema';
 
 import { IProductQueries } from '../product/product.queries';
 

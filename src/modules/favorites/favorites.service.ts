@@ -1,4 +1,4 @@
-import type { Favorite } from '@/shared/infrastructure/db/schema/favorite.schema';
+import type { Favorite } from '@/shared/infrastructure/db/schemes/favorite.schema';
 
 export interface IFavoritesService {
   getProductIds(favorites: Favorite[]): string[];

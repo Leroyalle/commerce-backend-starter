@@ -3,7 +3,7 @@ import { MiddlewareHandler } from 'hono';
 
 import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
 import { NotFoundException } from '@/shared/exceptions/exceptions';
-import { userSelectSchema } from '@/shared/infrastructure/db/schema/user.schema';
+import { userSelectSchema } from '@/shared/infrastructure/db/schemes/user.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 

@@ -2,7 +2,7 @@ import {
   Account,
   CredentialsAccount,
   OauthAccount,
-} from '@/shared/infrastructure/db/schema/account.schema';
+} from '@/shared/infrastructure/db/schemes/account.schema';
 
 import { DistributiveOmit } from '../distributive-omit.type';
 

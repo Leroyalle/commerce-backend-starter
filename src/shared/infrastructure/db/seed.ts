@@ -3,9 +3,9 @@ import { faker } from '@faker-js/faker/locale/ru';
 import { createModules } from '@/modules';
 
 import { db } from './client';
-import { Category, categorySchema } from './schema/category.schema';
-import { productSchema } from './schema/product.schema';
-import { productsToCategoriesSchema } from './schema/products-to-categories.schema';
+import { Category, categorySchema } from './schemes/category.schema';
+import { productSchema } from './schemes/product.schema';
+import { productsToCategoriesSchema } from './schemes/products-to-categories.schema';
 
 const { product, meilisearch, category } = await createModules();
 
@@ -23,7 +23,8 @@ async function seed() {
 
   for (let i = 0; i < 10; i++) {
     const name = faker.commerce.department();
-    const createdCategory = await category.commands.create({ name });
+    const description = faker.commerce.productDescription();
+    const createdCategory = await category.commands.create({ name, description });
     categories.push(createdCategory);
   }
 

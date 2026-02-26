@@ -1,4 +1,4 @@
-import { AccountWithRelations } from '@/shared/infrastructure/db/schema/account.schema';
+import { AccountWithRelations } from '@/shared/infrastructure/db/schemes/account.schema';
 
 import { ProviderName } from '../constants/providers-map.constant';
 

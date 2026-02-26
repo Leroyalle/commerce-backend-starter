@@ -8,6 +8,7 @@ import { productsToCategoriesSchema } from './products-to-categories.schema';
 export const categorySchema = pgTable('categories', {
   id: uuid().defaultRandom().primaryKey(),
   name: text().notNull(),
+  description: text().notNull(),
 });
 
 export const categoryRelations = relations(categorySchema, ({ many }) => ({

@@ -1,4 +1,4 @@
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product } from '@/shared/infrastructure/db/schemes/product.schema';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 
 import { IProductRepository } from './product.repo';
