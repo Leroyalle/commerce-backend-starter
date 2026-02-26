@@ -2,7 +2,7 @@ import { $, createRoute, OpenAPIHono, z } from '@hono/zod-openapi';
 import type { MiddlewareHandler } from 'hono';
 import { Index } from 'meilisearch';
 
-import { Product, productSelectSchema } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product, productSelectSchema } from '@/shared/infrastructure/db/schemes/product.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import type { AuthVars } from '@/shared/types/auth-variables.type';
 

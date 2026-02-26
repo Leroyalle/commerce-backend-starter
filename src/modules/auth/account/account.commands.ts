@@ -1,4 +1,4 @@
-import { Account } from '@/shared/infrastructure/db/schema/account.schema';
+import { Account } from '@/shared/infrastructure/db/schemes/account.schema';
 import { ICreateAccount, IUpdateAccount } from '@/shared/types/auth/create-account.type';
 
 import { IAccountRepository } from './account.repo';

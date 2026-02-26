@@ -1,8 +1,8 @@
 import { and, count, desc, eq, exists, inArray, SQL } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
-import { Product, productSchema } from '@/shared/infrastructure/db/schema/product.schema';
-import { productsToCategoriesSchema } from '@/shared/infrastructure/db/schema/products-to-categories.schema';
+import { Product, productSchema } from '@/shared/infrastructure/db/schemes/product.schema';
+import { productsToCategoriesSchema } from '@/shared/infrastructure/db/schemes/products-to-categories.schema';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 
 import { FindProductsQuery } from './schemas/find-products.schema';

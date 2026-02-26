@@ -4,7 +4,7 @@ import { db } from '@/shared/infrastructure/db/client';
 import {
   RefreshToken,
   refreshTokenSchema,
-} from '@/shared/infrastructure/db/schema/refresh-token.schema';
+} from '@/shared/infrastructure/db/schemes/refresh-token.schema';
 
 export interface ITokenRepository {
   create: (token: Omit<RefreshToken, 'id'>) => Promise<RefreshToken>;

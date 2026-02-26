@@ -11,10 +11,10 @@ export const favoriteSchema = pgTable(
   'favorites',
   {
     productId: uuid()
-      .references(() => productSchema.id)
+      .references(() => productSchema.id, { onDelete: 'cascade' })
       .notNull(),
     userId: uuid()
-      .references(() => userSchema.id)
+      .references(() => userSchema.id, { onDelete: 'cascade' })
       .notNull(),
     ...pgTimestamp,
   },

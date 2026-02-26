@@ -1,6 +1,6 @@
 import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
-import { Order } from '@/shared/infrastructure/db/schema/order.schema';
+import { Order } from '@/shared/infrastructure/db/schemes/order.schema';
 
 import { CartQueries } from '../cart/cart.queries';
 import { UserQueries } from '../user/user.queries';

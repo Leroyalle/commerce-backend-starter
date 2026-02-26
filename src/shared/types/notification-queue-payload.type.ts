@@ -1,5 +1,5 @@
-import { Order } from '../infrastructure/db/schema/order.schema';
-import { User } from '../infrastructure/db/schema/user.schema';
+import { Order } from '../infrastructure/db/schemes/order.schema';
+import { User } from '../infrastructure/db/schemes/user.schema';
 
 export type TMailQueuePayload =
   | { name: 'verify_email'; data: { email: string; code: number } }

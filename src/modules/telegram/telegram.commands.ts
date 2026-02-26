@@ -1,7 +1,7 @@
 import { Bot } from 'grammy';
 
-import { Order } from '@/shared/infrastructure/db/schema/order.schema';
-import { User } from '@/shared/infrastructure/db/schema/user.schema';
+import { Order } from '@/shared/infrastructure/db/schemes/order.schema';
+import { User } from '@/shared/infrastructure/db/schemes/user.schema';
 import { getEnv } from '@/shared/lib/helpers/get-env.helper';
 
 export interface ITelegramCommands {

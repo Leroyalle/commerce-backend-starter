@@ -1,4 +1,4 @@
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product } from '@/shared/infrastructure/db/schemes/product.schema';
 import { createMeilisearchClient } from '@/shared/infrastructure/meilisearch/client-factory';
 
 export async function createMeilisearchModule() {

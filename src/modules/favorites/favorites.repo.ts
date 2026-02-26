@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 
 import type { DB } from '@/shared/infrastructure/db/client';
-import { type Favorite, favoriteSchema } from '@/shared/infrastructure/db/schema/favorite.schema';
+import { type Favorite, favoriteSchema } from '@/shared/infrastructure/db/schemes/favorite.schema';
 
 export interface IFavoritesRepository {
   create: (data: { userId: string; productId: string }) => Promise<Favorite>;

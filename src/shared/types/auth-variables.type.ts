@@ -1,4 +1,4 @@
-import { User } from '../infrastructure/db/schema/user.schema';
+import { User } from '../infrastructure/db/schemes/user.schema';
 
 export type AuthVars = {
   user: User;

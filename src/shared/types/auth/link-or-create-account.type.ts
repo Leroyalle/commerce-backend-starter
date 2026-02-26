@@ -1,4 +1,4 @@
-import { Account } from '@/shared/infrastructure/db/schema/account.schema';
+import { Account } from '@/shared/infrastructure/db/schemes/account.schema';
 
 export type TLinkOrCreateAccountResult =
   | {

@@ -1,7 +1,7 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
 import { NotFoundException } from '@/shared/exceptions/exceptions';
-import { categorySelectSchema } from '@/shared/infrastructure/db/schema/category.schema';
+import { categorySelectSchema } from '@/shared/infrastructure/db/schemes/category.schema';
 import { paramsZodSchema } from '@/shared/infrastructure/zod/params.schema';
 import { AuthVars } from '@/shared/types/auth-variables.type';
 

@@ -1,4 +1,4 @@
-import { Category } from '@/shared/infrastructure/db/schema/category.schema';
+import { Category } from '@/shared/infrastructure/db/schemes/category.schema';
 
 import { ICategoryRepository } from './category.repo';
 

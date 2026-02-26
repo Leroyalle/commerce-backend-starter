@@ -1,6 +1,6 @@
 import type Redis from 'ioredis';
 
-import type { Favorite } from '@/shared/infrastructure/db/schema/favorite.schema';
+import type { Favorite } from '@/shared/infrastructure/db/schemes/favorite.schema';
 
 import type { IFavoritesRepository } from './favorites.repo';
 

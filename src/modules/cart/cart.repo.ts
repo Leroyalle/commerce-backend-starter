@@ -1,8 +1,12 @@
 import { desc, eq } from 'drizzle-orm';
 
 import { db } from '@/shared/infrastructure/db/client';
-import { cartItemSchema } from '@/shared/infrastructure/db/schema/cart-item.schema';
-import { Cart, cartSchema, CartWithRelations } from '@/shared/infrastructure/db/schema/cart.schema';
+import { cartItemSchema } from '@/shared/infrastructure/db/schemes/cart-item.schema';
+import {
+  Cart,
+  cartSchema,
+  CartWithRelations,
+} from '@/shared/infrastructure/db/schemes/cart.schema';
 
 export interface ICartRepository {
   create(userId: string): Promise<Cart>;

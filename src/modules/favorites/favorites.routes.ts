@@ -1,8 +1,8 @@
 import { createRoute, z } from '@hono/zod-openapi';
 
 import { SECURITY_SCHEMES } from '@/shared/constants/security-schemes.constants';
-import { favoritesSelectSchema } from '@/shared/infrastructure/db/schema/favorite.schema';
-import { productSelectSchema } from '@/shared/infrastructure/db/schema/product.schema';
+import { favoritesSelectSchema } from '@/shared/infrastructure/db/schemes/favorite.schema';
+import { productSelectSchema } from '@/shared/infrastructure/db/schemes/product.schema';
 
 export const addFavoriteRoute = createRoute({
   summary: 'Добавить товар в избранное',

@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 
 import { DB } from '@/shared/infrastructure/db/client';
-import { dataCounterSchema } from '@/shared/infrastructure/db/schema/data-counter.schema';
+import { dataCounterSchema } from '@/shared/infrastructure/db/schemes/data-counter.schema';
 
 interface Deps {
   db: DB;

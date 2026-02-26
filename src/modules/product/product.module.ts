@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import { Index } from 'meilisearch';
 
-import { Product } from '@/shared/infrastructure/db/schema/product.schema';
+import { Product } from '@/shared/infrastructure/db/schemes/product.schema';
 import { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
 import { IDataCounterCommands } from '../data-counter/data-counter.commands';

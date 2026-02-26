@@ -5,7 +5,7 @@ import { getEnv } from '@/shared/lib/helpers/get-env.helper';
 
 export default defineConfig({
   out: './drizzle',
-  schema: './src/shared/infrastructure/db/schema/*.ts',
+  schema: './src/shared/infrastructure/db/schemes/*.ts',
   dialect: 'postgresql',
   dbCredentials: {
     host: getEnv('DB_HOST'),
