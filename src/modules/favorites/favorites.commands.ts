@@ -1,3 +1,5 @@
+import type Redis from 'ioredis';
+
 import type { Favorite } from '@/shared/infrastructure/db/schema/favorite.schema';
 
 import type { IFavoritesRepository } from './favorites.repo';
@@ -9,16 +11,21 @@ export interface IFavoritesCommands {
 
 interface Deps {
   favoritesRepo: IFavoritesRepository;
+  redis: Redis;
 }
 
 export class FavoritesCommands implements IFavoritesCommands {
   constructor(private readonly deps: Deps) {}
 
   public async add(data: { userId: string; productId: string }): Promise<Favorite> {
-    return this.deps.favoritesRepo.create(data);
+    const existing = await this.deps.favoritesRepo.create(data);
+    await this.deps.redis.sadd(`user:${data.userId}:favorites`, data.productId);
+    return existing;
   }
 
   public async remove(data: { userId: string; productId: string }) {
-    return this.deps.favoritesRepo.remove(data);
+    const removed = this.deps.favoritesRepo.remove(data);
+    await this.deps.redis.srem(`user:${data.userId}:favorites`, data.productId);
+    return removed;
   }
 }

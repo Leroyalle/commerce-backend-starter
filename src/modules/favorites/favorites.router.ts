@@ -31,10 +31,7 @@ export function createFavoritesRouter(deps: Deps) {
   $(router).use(findFavoritesRoute.path, deps.accessAuthMiddleware);
   router.openapi(findFavoritesRoute, async c => {
     const user = c.get('user');
-    const favorites = await deps.favoritesQueries.findAllByUserId(user.id);
-    const favoriteIds = favorites
-      .map(favorite => favorite.productId)
-      .filter((id): id is string => !!id);
+    const favoriteIds = await deps.favoritesQueries.findAllByUserId(user.id);
     const products = await deps.productQueries.findByIds(favoriteIds);
     return c.json(products, 200);
   });

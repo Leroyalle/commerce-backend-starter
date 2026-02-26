@@ -16,7 +16,7 @@ import { redis } from './shared/infrastructure/redis/client';
 export async function createModules() {
   const meilisearch = await createMeilisearchModule();
 
-  const favorites = createFavoritesModule({ db });
+  const favorites = createFavoritesModule({ db, redis });
 
   const notificationProducer = new NotificationProducer(redis);
 
