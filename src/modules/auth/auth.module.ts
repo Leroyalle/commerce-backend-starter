@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { CreateModuleResult } from '@/shared/types/create-module.result.type';
 
+import type { CartCommands } from '../cart/cart.commands';
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
 
@@ -15,6 +16,7 @@ import { createTokenModule } from './token/token.module';
 type CreateAuthModuleDeps = {
   userCommands: UserCommands;
   userQueries: UserQueries;
+  cartCommands: CartCommands;
   redis: Redis;
   notificationProducer: INotificationProducer;
 };
@@ -40,6 +42,7 @@ export function createAuthModule(
     notificationProducer: deps.notificationProducer,
     accountCommands: accountModule.commands,
     accountQueries: accountModule.queries,
+    cartCommands: deps.cartCommands,
   });
   return { commands: authCommands, queries: authQueries };
 }

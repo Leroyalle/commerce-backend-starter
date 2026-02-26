@@ -20,4 +20,8 @@ export class CartItemCommands {
   public delete(id: string) {
     return this.deps.cartItemRepo.delete(id);
   }
+
+  public clearByCart(cartId: string) {
+    return this.deps.cartItemRepo.clearByCart(cartId);
+  }
 }

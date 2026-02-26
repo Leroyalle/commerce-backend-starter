@@ -28,13 +28,6 @@ export async function createModules() {
 
   const user = createUserModule();
 
-  const category = createCategoryModule({ db });
-  const auth = createAuthModule({
-    userCommands: user.commands,
-    userQueries: user.queries,
-    redis,
-    notificationProducer,
-  });
   const product = createProductModule({
     dataCounterQueries: dataCounter.queries,
     dataCounterCommands: dataCounter.commands,
@@ -44,8 +37,19 @@ export async function createModules() {
 
   const cart = createCartModule({ productQueries: product.queries });
 
+  const category = createCategoryModule({ db });
+
+  const auth = createAuthModule({
+    userCommands: user.commands,
+    userQueries: user.queries,
+    redis,
+    notificationProducer,
+    cartCommands: cart.commands,
+  });
+
   const order = createOrderModule({
     cartQueries: cart.queries,
+    cartCommands: cart.commands,
     userQueries: user.queries,
     notificationProducer: notificationProducer,
     redis,

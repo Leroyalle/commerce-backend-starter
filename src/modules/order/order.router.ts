@@ -78,7 +78,10 @@ export function createOrderRouter(deps: Deps): OpenAPIHono<{ Variables: AuthVars
     const user = c.get('user');
     const body = c.req.valid('json');
     const result = await deps.commands.createOrder(user.id, body);
-    return c.json({ success: result.success, message: 'Заказ успешно создан!' }, 201);
+    return c.json(
+      { success: result.success, message: 'Заказ успешно создан! Менеджер скоро свяжется с вами' },
+      201,
+    );
   });
 
   return router;

@@ -2,6 +2,7 @@ import { NotFoundException } from '@/shared/exceptions/exceptions';
 import { INotificationProducer } from '@/shared/infrastructure/broker/producers/notification.producer';
 import { Order } from '@/shared/infrastructure/db/schemes/order.schema';
 
+import type { CartCommands } from '../cart/cart.commands';
 import { CartQueries } from '../cart/cart.queries';
 import { UserQueries } from '../user/user.queries';
 
@@ -11,7 +12,7 @@ interface Deps {
   orderRepo: IOrderRepository;
   cartQueries: CartQueries;
   userQueries: UserQueries;
-  // notifierCommands: TelegramCommands;
+  cartCommands: CartCommands;
   notificationProducer: INotificationProducer;
 }
 
@@ -45,12 +46,21 @@ export class OrderCommands {
         product: item.product,
         quantity: item.quantity,
         cartId: item.cartId,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
       })),
     });
+
+    await this.deps.cartCommands.clearCart(cart.id);
 
     await this.deps.notificationProducer.sendAdminTelegramNotification('new_order_alert', {
       user,
       order,
+    });
+
+    await this.deps.notificationProducer.sendEmail('order_confirmed_email', {
+      email: user.email,
+      orderId: order.id,
     });
 
     return { success: true };

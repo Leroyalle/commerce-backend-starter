@@ -22,6 +22,7 @@ import {
 import { GitHubEmail } from '@/shared/types/auth/oauth/github-user-info.type';
 import { TOauthLoginCallbackResult } from '@/shared/types/auth/oauth/oauth-login-callback.type';
 
+import type { CartCommands } from '../cart/cart.commands';
 import { UserCommands } from '../user/user.commands';
 import { UserQueries } from '../user/user.queries';
 
@@ -53,6 +54,7 @@ export interface Deps {
   notificationProducer: INotificationProducer;
   accountQueries: IAccountQueries;
   accountCommands: IAccountCommands;
+  cartCommands: CartCommands;
 }
 
 export class AuthCommands {
@@ -123,8 +125,6 @@ export class AuthCommands {
       });
     }
 
-    // await this.deps.userCommands.update(findUser.id, { password: await argon2.hash(newPassword) });
-
     return { success: true };
   }
 
@@ -182,10 +182,16 @@ export class AuthCommands {
 
     const hashedPassword = await argon2.hash(input.password);
 
-    const createdUser = await this.deps.userCommands.create({
+    // const createdUser = await this.deps.userCommands.create({
+    //   email: input.email,
+    //   emailVerifiedAt: null,
+    //   name: input.name,
+    // });
+
+    const createdUser = await this.createUser({
       email: input.email,
-      emailVerifiedAt: null,
       name: input.name,
+      verifyEmail: false,
     });
 
     const account = await this.deps.accountCommands.create({
@@ -415,10 +421,16 @@ export class AuthCommands {
       };
     }
 
-    const createdUser = await this.deps.userCommands.create({
+    // const createdUser = await this.deps.userCommands.create({
+    //   email: data.email,
+    //   name: data.displayName,
+    //   emailVerifiedAt: new Date(),
+    // });
+
+    const createdUser = await this.createUser({
       email: data.email,
       name: data.displayName,
-      emailVerifiedAt: new Date(),
+      verifyEmail: true,
     });
 
     const createdAccount = await this.deps.accountCommands.create({
@@ -500,7 +512,16 @@ export class AuthCommands {
         throw NotFoundException.Account();
     }
   }
-  // public async findByJti(jti: string) {
-  //   return await this.deps.tokenQueries.findByJti(jti);
-  // }
+
+  private async createUser(input: { email: string; name: string; verifyEmail?: boolean }) {
+    const createdUser = await this.deps.userCommands.create({
+      email: input.email,
+      emailVerifiedAt: input.verifyEmail ? new Date() : null,
+      name: input.name,
+    });
+
+    await this.deps.cartCommands.create(createdUser.id);
+
+    return createdUser;
+  }
 }
