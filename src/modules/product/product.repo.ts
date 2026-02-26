@@ -13,6 +13,7 @@ export interface IProductRepository {
     price: number;
     aliases: string[];
     details: Record<string, unknown>;
+    description: string;
     image: string;
     categories: string[];
   }): Promise<Product>;
@@ -30,6 +31,7 @@ export class ProductRepo implements IProductRepository {
     image: string;
     details: Record<string, unknown>;
     aliases: string[];
+    description: string;
     categories: string[];
   }): Promise<Product> {
     const [product] = await db.insert(productSchema).values(data).returning();
@@ -70,6 +72,7 @@ export class ProductRepo implements IProductRepository {
         details: true,
         name: true,
         price: true,
+        description: true,
       },
       offset: (page - 1) * limit,
       orderBy: [desc(productSchema.createdAt)],
@@ -130,6 +133,9 @@ export class ProductRepo implements IProductRepository {
   }
 
   public findByIds(ids: string[]) {
-    return db.select().from(productSchema).where(inArray(productSchema.id, ids));
+    return db.query.productSchema.findMany({
+      where: inArray(productSchema.id, ids),
+      orderBy: [desc(productSchema.createdAt)],
+    });
   }
 }

@@ -19,6 +19,7 @@ export class ProductCommands {
     name: string;
     price: number;
     details: Record<string, unknown>;
+    description: string;
     image: string;
     aliases: string[];
     categories: string[];
