@@ -123,10 +123,19 @@ export function createProductRouter(deps: Deps): OpenAPIHono<{ Variables: Partia
     },
   });
 
+  $(productRouter).use(getProductByIdRoute.path, deps.optionalAccessGuard);
   productRouter.openapi(getProductByIdRoute, async c => {
     const params = c.req.valid('param');
+    const user = c.get('user');
+    const userFavoriteIds = new Set(
+      user ? await deps.favoritesQueries.findAllByUserId(user.id) : [],
+    );
     const data = await deps.queries.findById(params.id);
-    return c.json(data);
+    const product = {
+      ...data,
+      isFavorite: userFavoriteIds.has(data.id),
+    };
+    return c.json(product);
   });
 
   return productRouter;

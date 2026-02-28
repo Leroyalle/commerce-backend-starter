@@ -17,7 +17,9 @@ export class FavoritesQueriesCached implements IFavoritesQueries {
     const cachedUserFavorites = await this.deps.redis.smembers(key);
     if (cachedUserFavorites.length) return cachedUserFavorites;
     const favoriteIds = await this.deps.favoritesQueries.findAllByUserId(userId);
-    await this.deps.redis.sadd(key, favoriteIds);
+    if (favoriteIds.length > 0) {
+      await this.deps.redis.sadd(key, favoriteIds);
+    }
     return favoriteIds;
   }
 }
