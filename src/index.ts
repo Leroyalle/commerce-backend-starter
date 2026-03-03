@@ -10,6 +10,7 @@ import { createCategoryRouter } from './modules/category/category.router';
 import { createFavoritesRouter } from './modules/favorites/favorites.router';
 import { createOrderRouter } from './modules/order/order.router';
 import { createProductRouter } from './modules/product/product.router';
+import { createTelegramRouter } from './modules/telegram/telegram.router';
 import { createUserRouter } from './modules/user/user.router';
 import { SECURITY_SCHEMES } from './shared/constants/security-schemes.constants';
 import { ERROR_HTTP_STATUS } from './shared/exceptions/error-status-map';
@@ -81,7 +82,7 @@ app.onError((err, c) => {
   );
 });
 
-const { auth, cart, order, product, user, meilisearch, category, favorites } =
+const { auth, cart, order, product, user, meilisearch, category, favorites, telegram } =
   await createModules();
 
 const { accessGuard, refreshGuard, optionalAccessGuard } = createMiddlewares({
@@ -134,6 +135,12 @@ const orderRouter = createOrderRouter({
   queries: order.queries,
   commands: order.commands,
   accessAuthMiddleware: accessGuard,
+});
+
+createTelegramRouter({
+  bot: telegram.bot,
+  telegramCommands: telegram.commands,
+  productCommands: product.commands,
 });
 
 app.route('/user', userRouter);

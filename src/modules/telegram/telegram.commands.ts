@@ -12,12 +12,13 @@ import type { HandlerName } from './types/handlers.type';
 export interface ITelegramCommands {
   notifyAdminNewOrder(customer: User, order: Order): Promise<void>;
   onStart: (ctx: MyContext) => Promise<Message.TextMessage>;
+  onCallbackData: (ctx: MyContext) => Promise<Message.TextMessage | void>;
 }
 
 export class TelegramCommands implements ITelegramCommands {
   private adminChatId: string;
   constructor(
-    private readonly bot: Bot,
+    private readonly bot: Bot<MyContext>,
     private readonly telegramService: ITelegramService,
   ) {
     this.adminChatId = getEnv('TELEGRAM_ADMIN_CHAT_ID');
