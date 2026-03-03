@@ -9,3 +9,5 @@ export const createProductZodSchema = z.object({
   aliases: z.array(z.string().min(1).max(10)).default([]),
   categories: z.array(z.uuid()).default([]),
 });
+
+export type TCreateProduct = z.infer<typeof createProductZodSchema>;
