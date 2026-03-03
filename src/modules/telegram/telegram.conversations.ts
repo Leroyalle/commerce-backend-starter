@@ -8,12 +8,23 @@ import {
 
 import type { MyContext } from './types/context.type';
 
+export interface ITelegramConversations {
+  createProductConversation: (
+    conversation: Conversation<MyContext, MyContext>,
+    ctx: MyContext,
+  ) => Promise<void>;
+  removeProductConversation: (
+    conversation: Conversation<MyContext, MyContext>,
+    ctx: MyContext,
+  ) => Promise<void>;
+}
+
 interface Deps {
   createProduct: (data: TCreateProduct) => Promise<unknown>;
   removeProduct: (productId: string) => Promise<unknown>;
 }
 
-export class TelegramConversations {
+export class TelegramConversations implements ITelegramConversations {
   constructor(private readonly deps: Deps) {}
 
   public async createProductConversation(
