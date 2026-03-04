@@ -51,11 +51,11 @@ ${items}
     });
   }
 
-  public async onStart(ctx: MyContext) {
+  public onStart = async (ctx: MyContext) => {
     const userId = ctx.message?.from.id;
     if (!userId) return ctx.reply('Не передан userId');
 
-    if (this.telegramService.isAdmin(userId)) {
+    if (!this.telegramService.isAdmin(userId)) {
       return await ctx.reply('Вы не являетесь администратором 👨‍💼');
     }
     return await ctx.reply('Выбери действие:', {
@@ -66,9 +66,9 @@ ${items}
         ],
       },
     });
-  }
+  };
 
-  public async onCallbackData(ctx: MyContext) {
+  public onCallbackData = async (ctx: MyContext) => {
     const userId = ctx.callbackQuery?.from.id;
     await ctx.answerCallbackQuery();
     if (!userId) return ctx.reply('Не передан userId');
@@ -95,5 +95,5 @@ ${items}
       const handler = productHandlers[data as HandlerName];
       return await handler(ctx);
     }
-  }
+  };
 }

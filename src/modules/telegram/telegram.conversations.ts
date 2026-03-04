@@ -27,10 +27,10 @@ interface Deps {
 export class TelegramConversations implements ITelegramConversations {
   constructor(private readonly deps: Deps) {}
 
-  public async createProductConversation(
+  public createProductConversation = async (
     conversation: Conversation<MyContext, MyContext>,
     ctx: MyContext,
-  ) {
+  ) => {
     await ctx.reply('Пришли JSON массив продуктов');
 
     const { message } = await conversation.wait();
@@ -53,15 +53,16 @@ export class TelegramConversations implements ITelegramConversations {
       }
 
       await ctx.reply('✔️ Готово. Продукт проиндексирован и создан.');
-    } catch {
+    } catch (e) {
+      console.log(`TelegramConversations.createProduct`, e);
       await ctx.reply('❌ Невалидный JSON.');
     }
-  }
+  };
 
-  public async removeProductConversation(
+  public removeProductConversation = async (
     conversation: Conversation<MyContext, MyContext>,
     ctx: MyContext,
-  ) {
+  ) => {
     await ctx.reply('Пришли ID продукта');
 
     const { message } = await conversation.wait();
@@ -78,5 +79,5 @@ export class TelegramConversations implements ITelegramConversations {
     } catch {
       await ctx.reply('❌ Невалидный ID. Либо продукт не найден.');
     }
-  }
+  };
 }
