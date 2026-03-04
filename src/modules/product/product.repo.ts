@@ -5,23 +5,17 @@ import { Product, productSchema } from '@/shared/infrastructure/db/schemes/produ
 import { productsToCategoriesSchema } from '@/shared/infrastructure/db/schemes/products-to-categories.schema';
 import { IPaginationResult } from '@/shared/types/pagination-result.type';
 
+import type { TCreateProduct } from './schemas/create-product.schema';
 import { FindProductsQuery } from './schemas/find-products.schema';
 
 export interface IProductRepository {
-  create(data: {
-    name: string;
-    price: number;
-    aliases: string[];
-    details: Record<string, unknown>;
-    description: string;
-    image: string;
-    categories: string[];
-  }): Promise<Product>;
+  create(data: TCreateProduct): Promise<Product>;
   findAll(
     query?: FindProductsQuery,
   ): Promise<IPaginationResult<Pick<Product, 'id' | 'name' | 'price' | 'image' | 'details'>>>;
   findById(id: string): Promise<Product>;
   findByIds(ids: string[]): Promise<Product[]>;
+  remove(productId: string): Promise<Product>;
 }
 
 export class ProductRepo implements IProductRepository {
@@ -137,5 +131,9 @@ export class ProductRepo implements IProductRepository {
       where: inArray(productSchema.id, ids),
       orderBy: [desc(productSchema.createdAt)],
     });
+  }
+
+  public async remove(productId: string) {
+    return (await db.delete(productSchema).where(eq(productSchema.id, productId)).returning())[0];
   }
 }
