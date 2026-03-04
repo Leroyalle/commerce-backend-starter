@@ -22,8 +22,6 @@ export async function createModules() {
 
   const mailer = createMailerModule({ redis });
 
-  const telegram = createTelegramModule({ redis });
-
   const dataCounter = createDataCounterModule({ db: db });
 
   const user = createUserModule();
@@ -34,6 +32,8 @@ export async function createModules() {
     redis,
     searchIndex: meilisearch.indexes.productIndex,
   });
+
+  const telegram = createTelegramModule({ redis, productCommands: product.commands });
 
   const cart = createCartModule({ productQueries: product.queries });
 

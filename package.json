@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
+    "@grammyjs/conversations": "^2.1.1",
     "@hono/zod-openapi": "^1.2.2",
     "@hono/zod-validator": "^0.7.6",
     "@saintleroyalle/core": "^1.2.0",
