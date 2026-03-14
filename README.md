@@ -43,7 +43,6 @@
 - [Документация API](#-документация-api)
 - [Quick Start](#-quick-start)
 - [Docker](#-docker)
-- [Переменные окружения](#-переменные-окружения)
 
 ---
 
@@ -207,9 +206,9 @@ http://localhost:3000/docs
 # ⚡ Quick Start
 
 ```bash
-git clone https://github.com/your-repo/ecommerce-backend
+git clone https://github.com/Leroyalle/commerce-backend-starter.git
 
-cd ecommerce-backend
+cd commerce-backend-starter
 
 bun install
 
@@ -244,19 +243,3 @@ docker compose up -d
 - Redis
 - MeiliSearch
 - API сервер
-
----
-
-# ⚙️ Переменные окружения
-
-Пример конфигурации находится в файле:
-
-```
-.env.example
-```
-
-Основные сервисы:
-
-- PostgreSQL
-- Redis
-- MeiliSearch
